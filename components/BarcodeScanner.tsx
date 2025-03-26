@@ -3,6 +3,7 @@ import { Text, View, StyleSheet, Pressable } from "react-native";
 import { Camera, CameraView } from "expo-camera";
 import axios from "axios";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { ScanResponseType } from "@/types/releaseTypes";
 
 type BarCodeEvent = {
   type: string;
@@ -11,17 +12,6 @@ type BarCodeEvent = {
 
 type BarcodeScannerProps = {
   onScanComplete: (data: any) => void;
-};
-
-type ScanResponse = {
-  barcode: string;
-  releases?: Array<ReleasesType>;
-};
-
-type ReleasesType = {
-  id: string;
-  title?: string;
-  cover?: string;
 };
 
 function BarcodeScanner({ onScanComplete }: BarcodeScannerProps) {
@@ -54,8 +44,7 @@ function BarcodeScanner({ onScanComplete }: BarcodeScannerProps) {
         },
       );
 
-      // Type Assertion
-      const responseData = response.data as ScanResponse;
+      const responseData = response.data as ScanResponseType;
 
       if (responseData.releases && responseData.releases?.length > 0) {
         onScanComplete(responseData);
@@ -73,6 +62,7 @@ function BarcodeScanner({ onScanComplete }: BarcodeScannerProps) {
           error.response.data,
         );
         errorMessage = JSON.stringify(error.response.data);
+        console.error("Error:", error.response.data);
       } else if (error.request) {
         console.error("No response received:", error.request);
         errorMessage = "No response received from the server.";

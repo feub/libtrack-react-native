@@ -1,21 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet, Button, Image } from "react-native";
+import { View, StyleSheet, Button, Image, Pressable } from "react-native";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { ScanResponseType } from "@/types/releaseTypes";
 import BarcodeScanner from "@/components/BarcodeScanner";
 import MyText from "@/components/MyText";
 
-type ScanResponse = {
-  barcode: string;
-  releases?: Array<ReleasesType>;
-};
-
-type ReleasesType = {
-  id: string;
-  title?: string;
-  cover?: string;
-};
-
 export default function Index() {
-  const [scannedData, setScannedData] = useState<ScanResponse | null>(null);
+  const [scannedData, setScannedData] = useState<ScanResponseType | null>(null);
 
   const handleScanComplete = (data: any) => {
     setScannedData(data);
@@ -25,45 +16,85 @@ export default function Index() {
     setScannedData(null);
   };
 
+  const handleAddRelease = () => {
+    console.log("added!");
+  };
+
   return (
     <View style={styles.container}>
       {scannedData ? (
         <>
           <View>
-            <>
-              <MyText style={styles.dataText}>Results:</MyText>
-              <MyText style={styles.dataText}>
-                Barcode: {scannedData.barcode}
-              </MyText>
-              {scannedData.releases &&
-                scannedData.releases.map((release) => (
-                  <View id={release.id}>
+            <MyText style={styles.dataText}>
+              Barcode: {scannedData.barcode}
+            </MyText>
+            {scannedData.releases &&
+              scannedData.releases.map((release, index) => (
+                <View key={index.toString()} style={styles.resultItemContainer}>
+                  <View>
+                    {release["artist-credit"] &&
+                      release["artist-credit"].length > 0 && (
+                        <>
+                          <MyText style={styles.dataText}>
+                            Artist(s):{" "}
+                            {release["artist-credit"]?.map((artist, index) => {
+                              return (
+                                <MyText
+                                  style={styles.dataText}
+                                  key={index.toString()}
+                                >
+                                  {artist.name}
+                                </MyText>
+                              );
+                            })}
+                          </MyText>
+                        </>
+                      )}
                     <MyText style={styles.dataText}>
                       Title: {release.title || "Title not available"}
                     </MyText>
-                    {release.cover ? (
-                      <View
-                        style={{
-                          flex: 1,
-                          alignItems: "center",
-                        }}
-                      >
-                        <Image
-                          source={
-                            release.cover ? { uri: release.cover } : undefined
-                          }
-                          style={styles.image}
-                          resizeMode="cover"
-                        />
-                      </View>
-                    ) : (
-                      <MyText style={styles.dataText}>
-                        Cover not available
-                      </MyText>
+                    <MyText style={styles.dataText}>
+                      Date: {release.date || "Date not available"}
+                    </MyText>
+                    {release.media && release.media.length > 0 && (
+                      <>
+                        <MyText style={styles.dataText}>
+                          Media:{" "}
+                          {release.media?.map((media, index) => {
+                            return (
+                              <MyText
+                                style={styles.dataText}
+                                key={index.toString()}
+                              >
+                                {media.format}
+                              </MyText>
+                            );
+                          })}
+                        </MyText>
+                      </>
                     )}
+                    <Pressable onPress={() => handleAddRelease()}>
+                      <Ionicons
+                        name="add-circle-outline"
+                        size={38}
+                        color="black"
+                        style={styles.plusIcon}
+                      />
+                    </Pressable>
                   </View>
-                ))}
-            </>
+                  {release.cover ? (
+                    <Image
+                      source={
+                        release.cover ? { uri: release.cover } : undefined
+                      }
+                      style={styles.image}
+                      resizeMode="cover"
+                    />
+                  ) : (
+                    <MyText style={styles.dataText}>Cover not available</MyText>
+                  )}
+                </View>
+              ))}
           </View>
           <Button title="Scan Again" onPress={handleScanAgain} />
         </>
@@ -81,19 +112,31 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     fontFamily: "VarelaRound_400Regular",
-    backgroundColor: "#111113",
-    color: "#ffffff",
+    backgroundColor: "#18181b",
+    color: "#f1f1f1",
   },
   introText: {
-    color: "#ffffff",
+    color: "#f1f1f1",
     padding: 10,
   },
   dataText: {
-    color: "#ffffff",
-    padding: 10,
+    color: "#f1f1f1",
+  },
+  resultItemContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    color: "#f1f1f1",
+    backgroundColor: "#3f3f46",
+    marginBottom: 6,
+    padding: 6,
+    borderRadius: 6,
   },
   image: {
-    width: 200,
-    height: 200,
+    width: 150,
+    height: 150,
+  },
+  plusIcon: {
+    marginTop: 20,
+    color: "orange",
   },
 });
