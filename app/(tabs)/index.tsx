@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet, Button, Image, Pressable } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Button,
+  Image,
+  Pressable,
+  Alert,
+} from "react-native";
+import axios from "axios";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { ScanResponseType } from "@/types/releaseTypes";
 import BarcodeScanner from "@/components/BarcodeScanner";
@@ -16,8 +24,44 @@ export default function Index() {
     setScannedData(null);
   };
 
-  const handleAddRelease = () => {
-    console.log("added!");
+  const handleAddRelease = async (barcode: string, release_id: string) => {
+    console.log("barcode: ", barcode);
+    console.log("release_id: ", release_id);
+    try {
+      const response = await axios.post(
+        "http://192.168.1.63:8000/api/release/scan/add",
+        {
+          barcode: barcode,
+          release_id: release_id,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        },
+      );
+
+      type AddReleaseType = {
+        message: string;
+        type: string;
+      };
+
+      const responseData = response.data as AddReleaseType;
+
+      if (responseData.type === "success") {
+        setScannedData(null);
+        Alert.alert("🤟", "Release successfully added!", [{ text: "OK" }]);
+      } else {
+        Alert.alert("🧐", responseData.message, [{ text: "OK" }]);
+      }
+    } catch (error: any) {
+      Alert.alert(
+        "Network Error",
+        "Failed to send request. Please try again.",
+        [{ text: "OK" }],
+      );
+    }
   };
 
   return (
@@ -73,7 +117,11 @@ export default function Index() {
                         </MyText>
                       </>
                     )}
-                    <Pressable onPress={() => handleAddRelease()}>
+                    <Pressable
+                      onPress={() =>
+                        handleAddRelease(scannedData.barcode, release.id)
+                      }
+                    >
                       <Ionicons
                         name="add-circle-outline"
                         size={38}
