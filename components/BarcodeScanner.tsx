@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Text, View, StyleSheet, Pressable } from "react-native";
+import {
+  Text,
+  View,
+  StyleSheet,
+  Pressable,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
 import { Camera, CameraView } from "expo-camera";
 import axios from "axios";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
@@ -17,6 +24,7 @@ type BarcodeScannerProps = {
 function BarcodeScanner({ onScanComplete }: BarcodeScannerProps) {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [scanned, setScanned] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const getBarCodeScannerPermissions = async () => {
@@ -29,6 +37,7 @@ function BarcodeScanner({ onScanComplete }: BarcodeScannerProps) {
 
   const handleBarCodeScanned = async ({ type, data }: BarCodeEvent) => {
     setScanned(true);
+    setLoading(true);
 
     try {
       const response = await axios.post(
@@ -52,7 +61,8 @@ function BarcodeScanner({ onScanComplete }: BarcodeScannerProps) {
         onScanComplete(null);
       }
     } catch (error: any) {
-      console.error("Error sending request:", error);
+      Alert.alert("☠️", "Error sending request: " + error, [{ text: "OK" }]);
+
       let errorMessage = "An unexpected error occurred.";
 
       if (error.response) {
@@ -62,18 +72,23 @@ function BarcodeScanner({ onScanComplete }: BarcodeScannerProps) {
           error.response.data,
         );
         errorMessage = JSON.stringify(error.response.data);
-        console.error("Error:", error.response.data);
+        Alert.alert("☠️", "Error: " + error.response.data, [{ text: "OK" }]);
       } else if (error.request) {
-        console.error("No response received:", error.request);
         errorMessage = "No response received from the server.";
+        Alert.alert("☠️", "No response received: " + error.request, [
+          { text: "OK" },
+        ]);
       } else {
-        console.error("Error:", error.message);
+        Alert.alert("☠️", "Error: " + error.message, [{ text: "OK" }]);
       }
+
       onScanComplete({
         barcode: data,
         title: errorMessage,
         cover: errorMessage,
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -100,6 +115,12 @@ function BarcodeScanner({ onScanComplete }: BarcodeScannerProps) {
             </Text>
           </View>
         </CameraView>
+
+        {loading && (
+          <View style={styles.loaderContainer}>
+            <ActivityIndicator size="large" color="#fff" />
+          </View>
+        )}
 
         {scanned && (
           <View style={styles.circleButtonContainer}>
@@ -154,5 +175,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 42,
     backgroundColor: "#fff",
+  },
+  loaderContainer: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
