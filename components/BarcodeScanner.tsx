@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Text, View, StyleSheet, Button, Pressable } from "react-native";
+import { Text, View, StyleSheet, Pressable } from "react-native";
 import { Camera, CameraView } from "expo-camera";
 import axios from "axios";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import MyText from "./MyText";
 
 type BarCodeEvent = {
   type: string;

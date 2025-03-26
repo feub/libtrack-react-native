@@ -1,17 +1,78 @@
-import { Text, View, StyleSheet } from "react-native";
-import { Image } from "react-native";
-import icon from "@/assets/images/splash-icon.png";
+import React, { useState, useEffect } from "react";
+import { View, StyleSheet, Button, Image } from "react-native";
+import BarcodeScanner from "@/components/BarcodeScanner";
 import MyText from "@/components/MyText";
 
-export default function About() {
+type ScanResponse = {
+  barcode: string;
+  releases?: Array<ReleasesType>;
+};
+
+type ReleasesType = {
+  id: string;
+  title?: string;
+  cover?: string;
+};
+
+export default function Index() {
+  const [scannedData, setScannedData] = useState<ScanResponse | null>(null);
+
+  const handleScanComplete = (data: any) => {
+    setScannedData(data);
+  };
+
+  const handleScanAgain = () => {
+    setScannedData(null);
+  };
+
   return (
     <View style={styles.container}>
-      <Image source={icon} style={{ width: 100, height: 100 }} />
-      <Text style={styles.title}>About myCollection</Text>
-      <MyText style={styles.paragraph}>
-        Catalog your collections (CDs, vinyl, books, & more!) and rediscover
-        your treasures.
-      </MyText>
+      {scannedData ? (
+        <>
+          <View>
+            <>
+              <MyText style={styles.dataText}>Results:</MyText>
+              <MyText style={styles.dataText}>
+                Barcode: {scannedData.barcode}
+              </MyText>
+              {scannedData.releases &&
+                scannedData.releases.map((release) => (
+                  <View id={release.id}>
+                    <MyText style={styles.dataText}>
+                      Title: {release.title || "Title not available"}
+                    </MyText>
+                    {release.cover ? (
+                      <View
+                        style={{
+                          flex: 1,
+                          alignItems: "center",
+                        }}
+                      >
+                        <Image
+                          source={
+                            release.cover ? { uri: release.cover } : undefined
+                          }
+                          style={styles.image}
+                          resizeMode="cover"
+                        />
+                      </View>
+                    ) : (
+                      <MyText style={styles.dataText}>
+                        Cover not available
+                      </MyText>
+                    )}
+                  </View>
+                ))}
+            </>
+          </View>
+          <Button title="Scan Again" onPress={handleScanAgain} />
+        </>
+      ) : (
+        <>
+          <MyText style={styles.introText}>Scan an item 👇</MyText>
+          <BarcodeScanner onScanComplete={handleScanComplete} />
+        </>
+      )}
     </View>
   );
 }
@@ -19,26 +80,20 @@ export default function About() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    fontFamily: "VarelaRound_400Regular",
     backgroundColor: "#111113",
-    color: "white",
-    alignItems: "center",
-    paddingVertical: 10,
+    color: "#ffffff",
   },
-  entriesContainer: {
-    width: "100%",
+  introText: {
+    color: "#ffffff",
     padding: 10,
-    maxWidth: 600,
   },
-  title: {
+  dataText: {
     color: "#ffffff",
-    marginVertical: 10,
-    fontFamily: "Quicksand_700Bold",
-    fontSize: 24,
+    padding: 10,
   },
-  paragraph: {
-    color: "#ffffff",
-    fontSize: 18,
-    paddingHorizontal: 15,
-    marginBottom: 10,
+  image: {
+    width: 200,
+    height: 200,
   },
 });

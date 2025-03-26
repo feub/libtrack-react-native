@@ -1,5 +1,6 @@
 import { Tabs } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 export default function TabLayout() {
   return (
@@ -25,7 +26,16 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "myCollections",
+          title: "Scan",
+          tabBarIcon: ({ color, focused }) => (
+            <MaterialIcons name="qr-code-scanner" size={24} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="about"
+        options={{
+          title: "LibTrack",
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={focused ? "home-sharp" : "home-outline"}
@@ -36,21 +46,6 @@ export default function TabLayout() {
           headerTitleStyle: {
             fontFamily: "Quicksand_700Bold",
           },
-        }}
-      />
-      <Tabs.Screen
-        name="scan"
-        options={{
-          title: "Scan",
-          tabBarIcon: ({ color, focused }) => (
-            <Ionicons
-              name={
-                focused ? "information-circle" : "information-circle-outline"
-              }
-              color={color}
-              size={24}
-            />
-          ),
         }}
       />
     </Tabs>
