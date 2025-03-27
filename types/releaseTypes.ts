@@ -19,3 +19,11 @@ export type ReleasesType = {
   date?: string;
   media?: MediaType[];
 };
+
+export type ListReleasesType = {
+  id: string;
+  title?: string;
+  artists?: ArtistType[];
+  cover?: string;
+  release_date?: string;
+};
