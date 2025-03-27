@@ -9,6 +9,7 @@ import {
   ScrollView,
 } from "react-native";
 import axios from "axios";
+import { API_URL } from "@env";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { ScanResponseType } from "@/types/releaseTypes";
@@ -33,7 +34,7 @@ export default function Index() {
 
     try {
       const response = await axios.post(
-        "http://192.168.1.63:8000/api/release/scan/add",
+        `${API_URL}/api/release/scan/add`,
         {
           barcode: barcode,
           release_id: release_id,

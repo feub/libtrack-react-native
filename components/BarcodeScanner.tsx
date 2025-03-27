@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Text, View, StyleSheet, Alert, ActivityIndicator } from "react-native";
 import { Camera, CameraView } from "expo-camera";
 import axios from "axios";
+import { API_URL } from "@env";
 import { ScanResponseType } from "@/types/releaseTypes";
 import CircleButton from "./CircleButton";
 
@@ -34,7 +35,7 @@ function BarcodeScanner({ onScanComplete }: BarcodeScannerProps) {
 
     try {
       const response = await axios.post(
-        "http://192.168.1.63:8000/api/release/scan",
+        `${API_URL}/api/release/scan`,
         {
           barcode: data,
         },
