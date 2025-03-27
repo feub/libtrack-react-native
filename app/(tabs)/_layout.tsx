@@ -6,7 +6,7 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: "#FFE0C2", // 462100
+        tabBarActiveTintColor: "#f97316",
         headerStyle: {
           backgroundColor: "#111113",
         },
@@ -24,9 +24,25 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
+        name="releases"
+        options={{
+          title: "My collection",
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? "musical-notes-sharp" : "musical-notes-outline"}
+              color={color}
+              size={24}
+            />
+          ),
+          headerTitleStyle: {
+            fontFamily: "Quicksand_700Bold",
+          },
+        }}
+      />
+      <Tabs.Screen
         name="index"
         options={{
-          title: "Scan",
+          title: "Scanner",
           tabBarIcon: ({ color, focused }) => (
             <MaterialIcons name="qr-code-scanner" size={24} color={color} />
           ),
@@ -35,7 +51,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="about"
         options={{
-          title: "LibTrack",
+          title: "About",
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={focused ? "home-sharp" : "home-outline"}
