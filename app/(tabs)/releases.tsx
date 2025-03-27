@@ -1,58 +1,107 @@
-import { useEffect, useState } from "react";
-import { Image, View, StyleSheet, Alert } from "react-native";
+import { useCallback, useEffect, useState } from "react";
+import { View, StyleSheet, Alert, RefreshControl } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import axios from "axios";
 import { API_URL } from "@env";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { ListReleasesType } from "@/types/releaseTypes";
-import MyText from "@/components/MyText";
 import { FlatList } from "react-native-gesture-handler";
 import ReleaseListItem from "@/components/ReleaseListItem";
+import RectangleButton from "@/components/RectangleButton";
+import MyText from "@/components/MyText";
 
 export default function Releases() {
   const [releases, setReleases] = useState<ListReleasesType[]>([]);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [maxPage, setMaxPage] = useState<number>(1);
+  const [totalReleases, setTotalReleases] = useState<number>(0);
+  const [refreshing, setRefreshing] = useState<boolean>(false);
+
+  const fetchData = async (page: number) => {
+    console.log("Fetching data for page:", page);
+    try {
+      const response = await axios.get(`${API_URL}/api/release/list`, {
+        params: { page },
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      });
+
+      const responseData = response.data as {
+        type: string;
+        releases: any;
+        maxPage: number;
+        page: number;
+        totalReleases: number;
+      };
+
+      if (responseData.type === "success") {
+        setReleases(responseData.releases);
+        setMaxPage(responseData.maxPage);
+        setTotalReleases(responseData.totalReleases);
+      }
+    } catch (error: any) {
+      Alert.alert(
+        "API Error",
+        "Server not reachable. Please try again later.",
+        [{ text: "OK" }],
+      );
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(`${API_URL}/api/release/list`, {
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-        });
+    fetchData(currentPage);
+  }, [currentPage]);
 
-        const responseData = response.data as {
-          type: string;
-          releases: any;
-          maxPage: number;
-          page: number;
-        };
+  const onRefresh = useCallback(() => {
+    console.log("refreshed!");
 
-        if (responseData.type === "success") {
-          // console.log(responseData.releases);
-          setReleases(responseData.releases);
-        }
-      } catch (error: any) {
-        Alert.alert(
-          "API Error",
-          "Server not reachable. Please try again later.",
-          [{ text: "OK" }],
-        );
-      }
-    };
-
-    fetchData();
-  }, []);
+    setRefreshing(true);
+    fetchData(currentPage);
+  }, [currentPage]);
 
   return (
     <GestureHandlerRootView>
       <View style={styles.container}>
+        <MyText style={styles.dataText}>
+          {totalReleases} releases - page {currentPage}/{maxPage}
+        </MyText>
         <FlatList
           data={releases}
           renderItem={({ item }) => <ReleaseListItem release={item} />}
-          keyExtractor={(releases) => releases.id.toString()}
+          keyExtractor={(release) => release.id.toString()}
           style={styles.entriesContainer}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={["#9Bd35A", "#689a38"]}
+            />
+          }
+          ListEmptyComponent={
+            <MyText style={styles.dataText}>No releases available</MyText>
+          }
+          contentContainerStyle={{ flexGrow: 1 }}
         />
+        <View style={styles.navBtns}>
+          {currentPage > 1 && (
+            <RectangleButton
+              handleOnPress={() => setCurrentPage(currentPage - 1)}
+            >
+              <Ionicons name="arrow-back-circle" size={24} color="black" />
+            </RectangleButton>
+          )}
+          {currentPage < maxPage && (
+            <RectangleButton
+              handleOnPress={() => setCurrentPage(currentPage + 1)}
+            >
+              <Ionicons name="arrow-forward-circle" size={24} color="black" />
+            </RectangleButton>
+          )}
+        </View>
       </View>
     </GestureHandlerRootView>
   );
@@ -71,5 +120,14 @@ const styles = StyleSheet.create({
     width: "100%",
     padding: 14,
     maxWidth: 600,
+  },
+  navBtns: {
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingTop: 14,
+  },
+  dataText: {
+    color: "#f1f1f1",
   },
 });
