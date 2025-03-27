@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   StyleSheet,
@@ -28,6 +28,37 @@ export default function Index() {
   const handleScanAgain = () => {
     setScannedData(null);
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/api/release/health`, {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        });
+
+        const responseData = response.data as { type: string };
+
+        if (responseData.type !== "success") {
+          Alert.alert(
+            "API Error",
+            "Server not reachable. Please try again later.",
+            [{ text: "OK" }],
+          );
+        }
+      } catch (error: any) {
+        Alert.alert(
+          "API Error",
+          "Server not reachable. Please try again later.",
+          [{ text: "OK" }],
+        );
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleAddRelease = async (barcode: string, release_id: string) => {
     setLoading(true);
