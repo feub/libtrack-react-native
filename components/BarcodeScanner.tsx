@@ -1,16 +1,9 @@
 import React, { useState, useEffect } from "react";
-import {
-  Text,
-  View,
-  StyleSheet,
-  Pressable,
-  Alert,
-  ActivityIndicator,
-} from "react-native";
+import { Text, View, StyleSheet, Alert, ActivityIndicator } from "react-native";
 import { Camera, CameraView } from "expo-camera";
 import axios from "axios";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { ScanResponseType } from "@/types/releaseTypes";
+import CircleButton from "./CircleButton";
 
 type BarCodeEvent = {
   type: string;
@@ -84,8 +77,8 @@ function BarcodeScanner({ onScanComplete }: BarcodeScannerProps) {
 
       onScanComplete({
         barcode: data,
-        title: errorMessage,
-        cover: errorMessage,
+        title: errorMessage.toString(),
+        cover: errorMessage.toString(),
       });
     } finally {
       setLoading(false);
@@ -122,16 +115,7 @@ function BarcodeScanner({ onScanComplete }: BarcodeScannerProps) {
           </View>
         )}
 
-        {scanned && (
-          <View style={styles.circleButtonContainer}>
-            <Pressable
-              style={styles.circleButton}
-              onPress={() => setScanned(false)}
-            >
-              <MaterialIcons name="qr-code-scanner" size={38} color="#25292e" />
-            </Pressable>
-          </View>
-        )}
+        {scanned && <CircleButton setScanned={setScanned} />}
       </View>
     </>
   );
@@ -160,21 +144,6 @@ const styles = StyleSheet.create({
   dataText: {
     color: "#ffffff",
     padding: 10,
-  },
-  circleButtonContainer: {
-    position: "absolute",
-    bottom: 20,
-    left: 0,
-    right: 0,
-    alignItems: "center",
-  },
-  circleButton: {
-    width: 84,
-    height: 84,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 42,
-    backgroundColor: "#fff",
   },
   loaderContainer: {
     ...StyleSheet.absoluteFillObject,

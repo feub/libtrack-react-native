@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import {
   View,
   StyleSheet,
-  Button,
   Image,
   Pressable,
   Alert,
@@ -11,9 +10,11 @@ import {
 } from "react-native";
 import axios from "axios";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { ScanResponseType } from "@/types/releaseTypes";
 import BarcodeScanner from "@/components/BarcodeScanner";
 import MyText from "@/components/MyText";
+import CircleButton from "@/components/CircleButton";
 
 export default function Index() {
   const [scannedData, setScannedData] = useState<ScanResponseType | null>(null);
@@ -73,8 +74,8 @@ export default function Index() {
     <View style={styles.container}>
       {scannedData ? (
         <>
-          <View>
-            <MyText style={styles.dataText}>
+          <View style={styles.resultsContainer}>
+            <MyText style={styles.dataTextTitle}>
               Barcode: {scannedData.barcode}
             </MyText>
             <ScrollView style={{ maxHeight: 550 }}>
@@ -90,41 +91,31 @@ export default function Index() {
                           <>
                             <MyText style={styles.dataText}>
                               Artist(s):{" "}
-                              {release["artist-credit"]?.map(
-                                (artist, index) => {
-                                  return (
-                                    <MyText
-                                      style={styles.dataText}
-                                      key={index.toString()}
-                                    >
-                                      {artist.name}
-                                    </MyText>
-                                  );
-                                },
-                              )}
+                              {release["artist-credit"]
+                                .map((artist) => artist.name)
+                                .join(", ")}
                             </MyText>
                           </>
                         )}
                       <MyText style={styles.dataText}>
-                        Title: {release.title || "Title not available"}
+                        Title:{" "}
+                        {typeof release.title === "string"
+                          ? release.title
+                          : "Title not available"}
                       </MyText>
                       <MyText style={styles.dataText}>
-                        Date: {release.date || "Date not available"}
+                        Date:{" "}
+                        {typeof release.date === "string"
+                          ? release.date
+                          : "Date not available"}
                       </MyText>
                       {release.media && release.media.length > 0 && (
                         <>
                           <MyText style={styles.dataText}>
-                            Media:{" "}
-                            {release.media?.map((media, index) => {
-                              return (
-                                <MyText
-                                  style={styles.dataText}
-                                  key={index.toString()}
-                                >
-                                  {media.format}
-                                </MyText>
-                              );
-                            })}
+                            Media:
+                            {release.media
+                              .map((media) => media.format)
+                              .join(", ")}
                           </MyText>
                         </>
                       )}
@@ -144,7 +135,9 @@ export default function Index() {
                     {release.cover ? (
                       <Image
                         source={
-                          release.cover ? { uri: release.cover } : undefined
+                          typeof release.cover === "string"
+                            ? { uri: release.cover }
+                            : undefined
                         }
                         style={styles.image}
                         resizeMode="cover"
@@ -158,7 +151,7 @@ export default function Index() {
                 ))}
             </ScrollView>
           </View>
-          <Button title="Scan Again" onPress={handleScanAgain} />
+          <CircleButton setScanned={handleScanAgain} />
 
           {loading && (
             <View style={styles.loaderContainer}>
@@ -168,7 +161,12 @@ export default function Index() {
         </>
       ) : (
         <>
-          <MyText style={styles.introText}>Scan an item 👇</MyText>
+          <View style={styles.topTextContainer}>
+            <View style={styles.textIconContainer}>
+              <MaterialIcons name="qr-code-scanner" size={24} color="white" />
+              <MyText style={styles.dataTextScanAnItem}>Scan an item 👇</MyText>
+            </View>
+          </View>
           <BarcodeScanner onScanComplete={handleScanComplete} />
         </>
       )}
@@ -183,25 +181,46 @@ const styles = StyleSheet.create({
     backgroundColor: "#18181b",
     color: "#f1f1f1",
   },
-  introText: {
+  topTextContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
     color: "#f1f1f1",
-    padding: 10,
+    padding: 14,
+  },
+  textIconContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  dataTextScanAnItem: {
+    fontSize: 20,
+    color: "#f1f1f1",
+    marginLeft: 5,
+  },
+  dataTextTitle: {
+    fontSize: 20,
+    color: "#f1f1f1",
+    paddingBottom: 14,
   },
   dataText: {
     color: "#f1f1f1",
+  },
+  resultsContainer: {
+    padding: 14,
   },
   resultItemContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     color: "#f1f1f1",
     backgroundColor: "#3f3f46",
-    marginBottom: 6,
-    padding: 6,
-    borderRadius: 6,
+    marginBottom: 10,
+    padding: 8,
+    borderRadius: 10,
   },
   image: {
     width: 150,
     height: 150,
+    borderRadius: 6,
   },
   plusIcon: {
     marginTop: 20,
