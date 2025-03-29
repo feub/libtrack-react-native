@@ -9,7 +9,6 @@ import {
   ScrollView,
 } from "react-native";
 import axios from "axios";
-import { API_URL } from "@env";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { ScanResponseType } from "@/types/releaseTypes";
@@ -32,12 +31,15 @@ export default function Index() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`${API_URL}/api/release/health`, {
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
+        const response = await axios.get(
+          `${process.env.EXPO_PUBLIC_API_URL}/api/release/health`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
           },
-        });
+        );
 
         const responseData = response.data as { type: string };
 
@@ -65,7 +67,7 @@ export default function Index() {
 
     try {
       const response = await axios.post(
-        `${API_URL}/api/release/scan/add`,
+        `${process.env.EXPO_PUBLIC_API_URL}/api/release/scan/add`,
         {
           barcode: barcode,
           release_id: release_id,

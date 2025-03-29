@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from "react";
 import { View, StyleSheet, Alert, RefreshControl } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import axios from "axios";
-import { API_URL } from "@env";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { ListReleasesType } from "@/types/releaseTypes";
 import { FlatList } from "react-native-gesture-handler";
@@ -20,13 +19,16 @@ export default function Releases() {
   const fetchData = async (page: number) => {
     console.log("Fetching data for page:", page);
     try {
-      const response = await axios.get(`${API_URL}/api/release/list`, {
-        params: { page },
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
+      const response = await axios.get(
+        `${process.env.EXPO_PUBLIC_API_URL}/api/release/list`,
+        {
+          params: { page },
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
         },
-      });
+      );
 
       const responseData = response.data as {
         type: string;
