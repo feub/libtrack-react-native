@@ -1,5 +1,5 @@
 import React from "react";
-import { Image, View, StyleSheet, Alert } from "react-native";
+import { Image, View, StyleSheet } from "react-native";
 import { ListReleasesType } from "@/types/releaseTypes";
 import MyText from "@/components/MyText";
 
@@ -21,7 +21,12 @@ function ReleaseListItem({ release }: { release: ListReleasesType }) {
         <Image
           source={
             typeof release.cover === "string"
-              ? { uri: release.cover }
+              ? {
+                  uri:
+                    (process.env.EXPO_PUBLIC_API_URL || "") +
+                    process.env.EXPO_PUBLIC_COVER_PATH +
+                    release.cover,
+                }
               : undefined
           }
           style={styles.image}
