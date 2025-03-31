@@ -143,7 +143,8 @@ const styles = StyleSheet.create({
   },
   entriesContainer: {
     width: "100%",
-    padding: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
     maxWidth: 600,
   },
   navBtns: {

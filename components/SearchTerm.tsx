@@ -38,7 +38,6 @@ export default function SearchTerm({ onSubmit }: SearchFormProps) {
   };
 
   const handleResetSearch = async () => {
-    console.log("PRESSED");
     reset({ searchTerm: "" });
 
     try {
@@ -89,7 +88,8 @@ export default function SearchTerm({ onSubmit }: SearchFormProps) {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 14,
+    paddingHorizontal: 14,
+    paddingBottom: 10,
     width: "100%",
   },
   inputContainer: {
