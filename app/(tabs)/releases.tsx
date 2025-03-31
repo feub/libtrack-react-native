@@ -29,8 +29,6 @@ export default function Releases() {
     setLoading(true);
 
     try {
-      console.log("fetching? " + searchTerm);
-
       const response = await axios.get(
         `${process.env.EXPO_PUBLIC_API_URL}/api/release/list`,
         {
@@ -68,7 +66,6 @@ export default function Releases() {
   };
 
   useEffect(() => {
-    console.log("search triggered?");
     fetchData(currentPage, searchTerm);
   }, [currentPage, searchTerm]);
 

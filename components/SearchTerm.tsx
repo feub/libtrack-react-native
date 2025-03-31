@@ -23,11 +23,26 @@ export default function SearchTerm({ onSubmit }: SearchFormProps) {
     control,
     handleSubmit,
     formState: { errors },
+    watch,
+    reset,
   } = useForm<SearchTermType>();
+
+  const searchTerm = watch("searchTerm");
 
   const onSubmitForm = async (data: SearchTermType) => {
     try {
       await onSubmit(data);
+    } catch (error) {
+      console.error("Failed to submit form:", error);
+    }
+  };
+
+  const handleResetSearch = async () => {
+    console.log("PRESSED");
+    reset({ searchTerm: "" });
+
+    try {
+      await onSubmit({ searchTerm: "" });
     } catch (error) {
       console.error("Failed to submit form:", error);
     }
@@ -58,9 +73,13 @@ export default function SearchTerm({ onSubmit }: SearchFormProps) {
             )}
           />
 
+          {searchTerm && (
+            <Pressable style={styles.buttonCancel} onPress={handleResetSearch}>
+              <MaterialIcons name="cancel" size={16} color="#25292e" />
+            </Pressable>
+          )}
           <Pressable style={styles.button} onPress={handleSubmit(onSubmitForm)}>
             <MaterialIcons name="search" size={16} color="#25292e" />
-            <Text style={styles.buttonText}>Search</Text>
           </Pressable>
         </View>
       </View>
@@ -97,8 +116,11 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 10,
   },
-  buttonText: {
+  buttonCancel: {
+    position: "absolute",
+    right: 60,
     fontWeight: "bold",
+    zIndex: 100,
   },
   errorText: {
     color: "red",
