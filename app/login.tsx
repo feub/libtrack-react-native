@@ -34,7 +34,7 @@ const Login = () => {
 
       Alert.alert("👍 Login Successful", `Welcome ${user}! 👋`);
 
-      router.replace("../index");
+      router.replace("/(tabs)");
     } catch (error: any) {
       if (error.response) {
         console.log(error.response);
@@ -44,7 +44,6 @@ const Login = () => {
           error.response.data.message || "An error occurred",
         );
       } else {
-        // Handle network errors
         Alert.alert("Login Failed", "Network error occurred");
       }
     }
