@@ -7,23 +7,31 @@ export type ArtistType = {
   name: string;
 };
 
-export type MediaType = {
-  format: string;
+export type CoverType = {
+  formats: string;
 };
 
 export type ReleasesType = {
   id: string;
   title?: string;
-  "artist-credit"?: ArtistType[];
-  cover?: string;
-  date?: string;
-  media?: MediaType[];
+  artists?: ArtistType[];
+  images?: [
+    {
+      uri: string;
+    },
+  ];
+  year?: number;
+  formats: [
+    {
+      name: string;
+    },
+  ];
 };
 
 export type ListReleasesType = {
   id: string;
   title?: string;
   artists?: ArtistType[];
-  cover?: string;
+  cover?: CoverType[];
   release_date?: string;
 };

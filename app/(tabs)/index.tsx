@@ -92,11 +92,18 @@ export default function Index() {
         Alert.alert("🧐", responseData.message, [{ text: "OK" }]);
       }
     } catch (error: any) {
-      Alert.alert(
-        "Network Error",
-        "Failed to send request. Please try again.",
-        [{ text: "OK" }],
-      );
+      if (error.response) {
+        const errorMessage =
+          error.response.data.message ||
+          "Failed to send request. Please try again.";
+        Alert.alert("🧐", errorMessage, [{ text: "OK" }]);
+      } else {
+        Alert.alert(
+          "Network Error",
+          "Failed to send request. Please try again.",
+          [{ text: "OK" }],
+        );
+      }
     } finally {
       setLoading(false);
     }
@@ -173,35 +180,8 @@ const styles = StyleSheet.create({
     color: "#f1f1f1",
     paddingBottom: 14,
   },
-  dataText: {
-    color: "#f1f1f1",
-    flexShrink: 1,
-  },
   resultsContainer: {
     padding: 14,
-  },
-  resultItemContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    color: "#f1f1f1",
-    backgroundColor: "#3f3f46",
-    marginBottom: 10,
-    padding: 8,
-    borderRadius: 10,
-  },
-  textContainer: {
-    flex: 1,
-    maxWidth: "70%",
-  },
-  image: {
-    width: 120,
-    height: 120,
-    borderRadius: 6,
-    marginLeft: 4,
-  },
-  plusIcon: {
-    marginTop: 20,
-    color: "orange",
   },
   loaderContainer: {
     ...StyleSheet.absoluteFillObject,
