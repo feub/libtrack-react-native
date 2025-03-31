@@ -1,23 +1,27 @@
 import { useCallback, useEffect, useState } from "react";
-import { View, StyleSheet, Alert, RefreshControl } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Alert,
+  RefreshControl,
+  ScrollView,
+} from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import axios from "axios";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { ListReleasesType } from "@/types/releaseTypes";
-import { FlatList } from "react-native-gesture-handler";
+import { ReleasesType } from "@/types/releaseTypes";
 import ReleaseListItem from "@/components/ReleaseListItem";
 import RectangleButton from "@/components/RectangleButton";
 import MyText from "@/components/MyText";
 
 export default function Releases() {
-  const [releases, setReleases] = useState<ListReleasesType[]>([]);
+  const [releases, setReleases] = useState<ReleasesType[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [maxPage, setMaxPage] = useState<number>(1);
   const [totalReleases, setTotalReleases] = useState<number>(0);
   const [refreshing, setRefreshing] = useState<boolean>(false);
 
   const fetchData = async (page: number) => {
-    console.log("Fetching data for page:", page);
     try {
       const response = await axios.get(
         `${process.env.EXPO_PUBLIC_API_URL}/api/release/list`,
@@ -59,10 +63,12 @@ export default function Releases() {
   }, [currentPage]);
 
   const onRefresh = useCallback(() => {
-    console.log("refreshed!");
-
     setRefreshing(true);
-    fetchData(currentPage);
+
+    setTimeout(() => {
+      setRefreshing(false);
+      fetchData(currentPage);
+    }, 2000);
   }, [currentPage]);
 
   return (
@@ -71,23 +77,21 @@ export default function Releases() {
         <MyText style={styles.dataText}>
           {totalReleases} releases - page {currentPage}/{maxPage}
         </MyText>
-        <FlatList
-          data={releases}
-          renderItem={({ item }) => <ReleaseListItem release={item} />}
-          keyExtractor={(release) => release.id.toString()}
+        <ScrollView
           style={styles.entriesContainer}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
               onRefresh={onRefresh}
-              colors={["#9Bd35A", "#689a38"]}
+              colors={["#f97316", "#010101"]}
             />
           }
-          ListEmptyComponent={
-            <MyText style={styles.dataText}>No releases available</MyText>
-          }
-          contentContainerStyle={{ flexGrow: 1 }}
-        />
+        >
+          {releases &&
+            releases.map((release, index) => (
+              <ReleaseListItem key={index} release={release} />
+            ))}
+        </ScrollView>
         <View style={styles.navBtns}>
           {currentPage > 1 && (
             <RectangleButton
