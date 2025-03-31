@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { ReleasesType } from "@/types/releaseTypes";
@@ -29,6 +30,8 @@ export default function Releases() {
     setLoading(true);
 
     try {
+      const token = await AsyncStorage.getItem("userToken");
+
       const response = await axios.get(
         `${process.env.EXPO_PUBLIC_API_URL}/api/release/list`,
         {
@@ -36,6 +39,7 @@ export default function Releases() {
           headers: {
             "Content-Type": "application/json",
             Accept: "application/json",
+            Authorization: `Bearer ${token}`,
           },
         },
       );

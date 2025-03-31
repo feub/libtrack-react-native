@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useForm, Controller } from "react-hook-form";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import {

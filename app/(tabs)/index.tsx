@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   ScrollView,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { ScanResponseType } from "@/types/releaseTypes";
@@ -29,12 +30,15 @@ export default function Index() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const token = await AsyncStorage.getItem("userToken");
+
         const response = await axios.get(
           `${process.env.EXPO_PUBLIC_API_URL}/api/release/health`,
           {
             headers: {
               "Content-Type": "application/json",
               Accept: "application/json",
+              Authorization: `Bearer ${token}`,
             },
           },
         );
@@ -64,6 +68,8 @@ export default function Index() {
     setLoading(true);
 
     try {
+      const token = await AsyncStorage.getItem("userToken");
+
       const response = await axios.post(
         `${process.env.EXPO_PUBLIC_API_URL}/api/release/scan/add`,
         {
@@ -74,6 +80,7 @@ export default function Index() {
           headers: {
             "Content-Type": "application/json",
             Accept: "application/json",
+            Authorization: `Bearer ${token}`,
           },
         },
       );

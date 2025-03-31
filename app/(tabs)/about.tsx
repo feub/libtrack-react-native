@@ -2,6 +2,7 @@ import { Text, View, StyleSheet } from "react-native";
 import { Image } from "react-native";
 import icon from "@/assets/images/splash-icon.png";
 import MyText from "@/components/MyText";
+import LogoutButton from "@/components/LogoutButton";
 
 export default function About() {
   return (
@@ -12,6 +13,7 @@ export default function About() {
         Catalog your collections (CDs, vinyl, books, & more!) and rediscover
         your treasures.
       </MyText>
+      <LogoutButton />
     </View>
   );
 }
@@ -23,11 +25,6 @@ const styles = StyleSheet.create({
     color: "white",
     alignItems: "center",
     paddingVertical: 10,
-  },
-  entriesContainer: {
-    width: "100%",
-    padding: 10,
-    maxWidth: 600,
   },
   title: {
     color: "#ffffff",
