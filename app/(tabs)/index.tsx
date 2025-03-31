@@ -2,19 +2,17 @@ import React, { useEffect, useState } from "react";
 import {
   View,
   StyleSheet,
-  Image,
-  Pressable,
   Alert,
   ActivityIndicator,
   ScrollView,
 } from "react-native";
 import axios from "axios";
-import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { ScanResponseType } from "@/types/releaseTypes";
 import BarcodeScanner from "@/components/BarcodeScanner";
 import MyText from "@/components/MyText";
 import CircleButton from "@/components/CircleButton";
+import ScannedReleaseListItem from "@/components/ScannedReleaseListItem";
 
 export default function Index() {
   const [scannedData, setScannedData] = useState<ScanResponseType | null>(null);
@@ -115,73 +113,12 @@ export default function Index() {
             <ScrollView style={{ maxHeight: 550 }}>
               {scannedData.releases &&
                 scannedData.releases.map((release, index) => (
-                  <View
+                  <ScannedReleaseListItem
                     key={index.toString()}
-                    style={styles.resultItemContainer}
-                  >
-                    <View>
-                      {release["artist-credit"] &&
-                        release["artist-credit"].length > 0 && (
-                          <>
-                            <MyText style={styles.dataText}>
-                              Artist(s):{" "}
-                              {release["artist-credit"]
-                                .map((artist) => artist.name)
-                                .join(", ")}
-                            </MyText>
-                          </>
-                        )}
-                      <MyText style={styles.dataText}>
-                        Title:{" "}
-                        {typeof release.title === "string"
-                          ? release.title
-                          : "Title not available"}
-                      </MyText>
-                      <MyText style={styles.dataText}>
-                        Date:{" "}
-                        {typeof release.date === "string"
-                          ? release.date
-                          : "Date not available"}
-                      </MyText>
-                      {release.media && release.media.length > 0 && (
-                        <>
-                          <MyText style={styles.dataText}>
-                            Media:
-                            {release.media
-                              .map((media) => media.format)
-                              .join(", ")}
-                          </MyText>
-                        </>
-                      )}
-                      <Pressable
-                        onPress={() =>
-                          handleAddRelease(scannedData.barcode, release.id)
-                        }
-                      >
-                        <Ionicons
-                          name="add-circle-outline"
-                          size={38}
-                          color="black"
-                          style={styles.plusIcon}
-                        />
-                      </Pressable>
-                    </View>
-                    {release.cover ? (
-                      <Image
-                        source={
-                          typeof release.cover === "string"
-                            ? { uri: release.cover }
-                            : undefined
-                        }
-                        style={styles.image}
-                        resizeMode="cover"
-                      />
-                    ) : (
-                      <MyText style={styles.dataText}>
-                        Cover not available
-                      </MyText>
-                    )}
-                  </View>
+                    release={release}
+                    barcode={scannedData.barcode}
+                    handleAddRelease={handleAddRelease}
+                  />
                 ))}
             </ScrollView>
           </View>
@@ -238,6 +175,7 @@ const styles = StyleSheet.create({
   },
   dataText: {
     color: "#f1f1f1",
+    flexShrink: 1,
   },
   resultsContainer: {
     padding: 14,
@@ -251,10 +189,15 @@ const styles = StyleSheet.create({
     padding: 8,
     borderRadius: 10,
   },
+  textContainer: {
+    flex: 1,
+    maxWidth: "70%",
+  },
   image: {
-    width: 150,
-    height: 150,
+    width: 120,
+    height: 120,
     borderRadius: 6,
+    marginLeft: 4,
   },
   plusIcon: {
     marginTop: 20,
