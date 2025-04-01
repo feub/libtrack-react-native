@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "myCollections",
-    "slug": "myCollections",
+    "name": "LibTrack Scanner",
+    "slug": "libtrack-scanner",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "assets/images/icon.png",
@@ -15,7 +15,8 @@
       "adaptiveIcon": {
         "foregroundImage": "assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.feub.libtrackscanner"
     },
     "web": {
       "bundler": "metro",
@@ -36,6 +37,14 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "36090536-d72d-4717-ac5b-aad2add9be8e"
+      }
     }
   }
 }
