@@ -4,6 +4,8 @@ import icon from "@/assets/images/splash-icon.png";
 import MyText from "@/components/MyText";
 import LogoutButton from "@/components/LogoutButton";
 
+const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+
 export default function About() {
   return (
     <View style={styles.container}>
@@ -14,6 +16,7 @@ export default function About() {
         your treasures.
       </MyText>
       <LogoutButton />
+      <MyText style={{ color: "#f1f1f1" }}>API: {apiUrl}</MyText>
     </View>
   );
 }

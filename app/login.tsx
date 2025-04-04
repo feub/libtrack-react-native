@@ -1,14 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
 import { View, TextInput, Alert, StyleSheet, Pressable } from "react-native";
 import { useRouter } from "expo-router";
-import axios from "axios";
+import { axiosInstance } from "@/services/axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import MyText from "@/components/MyText";
 
+const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+const loginEndpoint = apiUrl + "/api/login";
+
 const Login = () => {
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
+  const [email, setEmail] = useState<string>("fabien@feub.net");
+  const [password, setPassword] = useState<string>("adminadmin");
   const emailInputRef = useRef<TextInput>(null);
   const router = useRouter();
 
@@ -20,30 +23,29 @@ const Login = () => {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post(
-        `${process.env.EXPO_PUBLIC_API_URL}/api/login`,
-        {
-          username: email,
-          password,
-        },
-      );
+      const response = await axiosInstance.post(loginEndpoint, {
+        username: email,
+        password,
+      });
+
+      console.log("LOGIN: ", response.data);
 
       const { user, token } = response.data as { user: string; token: string };
 
       await AsyncStorage.setItem("userToken", token);
 
-      Alert.alert("👍 Login Successful", `Welcome ${user}! 👋`);
+      Alert.alert("👍 Login Successful", `Welcome ${user}! 👋 ${token}`);
 
       router.replace("/(tabs)");
     } catch (error: any) {
       if (error.response) {
-        console.log(error.response);
-
+        console.log("if error.response", error.response);
         Alert.alert(
           "Login Failed",
           error.response.data.message || "An error occurred",
         );
       } else {
+        console.log("else", error);
         Alert.alert("Login Failed", "Network error occurred");
       }
     }
@@ -51,6 +53,8 @@ const Login = () => {
 
   return (
     <View style={styles.container}>
+      <MyText style={styles.title}>Sign in</MyText>
+      <MyText style={{ color: "#f1f1f1" }}>API: {apiUrl}</MyText>
       <TextInput
         ref={emailInputRef}
         placeholder="Email"
@@ -84,6 +88,12 @@ const styles = StyleSheet.create({
     color: "white",
     alignItems: "center",
     padding: 14,
+  },
+  title: {
+    color: "#ffffff",
+    marginVertical: 10,
+    fontFamily: "Quicksand_700Bold",
+    fontSize: 24,
   },
   input: {
     color: "#000000",

@@ -7,7 +7,7 @@ import {
   ScrollView,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
+import { axiosInstance } from "@/services/axios";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { ScanResponseType } from "@/types/releaseTypes";
 import BarcodeScanner from "@/components/BarcodeScanner";
@@ -15,6 +15,9 @@ import MyText from "@/components/MyText";
 import CircleButton from "@/components/CircleButton";
 import ScannedReleaseListItem from "@/components/ScannedReleaseListItem";
 
+const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+const healthEndpoint = apiUrl + "/api/release/health";
+const scanAddEndpoint = apiUrl + "/api/release/scan/add";
 export default function Index() {
   const [scannedData, setScannedData] = useState<ScanResponseType | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -30,32 +33,27 @@ export default function Index() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = await AsyncStorage.getItem("userToken");
+        //const token = await AsyncStorage.getItem("userToken");
 
-        const response = await axios.get(
-          `${process.env.EXPO_PUBLIC_API_URL}/api/release/health`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Accept: "application/json",
-              Authorization: `Bearer ${token}`,
-            },
+        const response = await axiosInstance.get(healthEndpoint, {
+          headers: {
+            // Authorization: `Bearer ${token}`,
           },
-        );
+        });
 
         const responseData = response.data as { type: string };
 
         if (responseData.type !== "success") {
           Alert.alert(
             "API Error",
-            "Server not reachable. Please try again later.",
+            `Server not reachable. Please try again later.\n${healthEndpoint}`,
             [{ text: "OK" }],
           );
         }
       } catch (error: any) {
         Alert.alert(
           "API Error",
-          "Server not reachable. Please try again later.",
+          `Server not reachable. Please try again later.\n${healthEndpoint}`,
           [{ text: "OK" }],
         );
       }
@@ -68,19 +66,17 @@ export default function Index() {
     setLoading(true);
 
     try {
-      const token = await AsyncStorage.getItem("userToken");
+      // const token = await AsyncStorage.getItem("userToken");
 
-      const response = await axios.post(
-        `${process.env.EXPO_PUBLIC_API_URL}/api/release/scan/add`,
+      const response = await axiosInstance.post(
+        scanAddEndpoint,
         {
           barcode: barcode,
           release_id: release_id,
         },
         {
           headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-            Authorization: `Bearer ${token}`,
+            // Authorization: `Bearer ${token}`,
           },
         },
       );

@@ -3,6 +3,9 @@ import { Image, View, StyleSheet } from "react-native";
 import { ListReleasesType } from "@/types/releaseTypes";
 import MyText from "@/components/MyText";
 
+const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+const coverPath = process.env.EXPO_PUBLIC_COVER_PATH;
+
 function ReleaseListItem({ release }: { release: ListReleasesType }) {
   return (
     <View key={release.id.toString()} style={styles.resultItemContainer}>
@@ -22,10 +25,7 @@ function ReleaseListItem({ release }: { release: ListReleasesType }) {
           source={
             typeof release.cover === "string"
               ? {
-                  uri:
-                    (process.env.EXPO_PUBLIC_API_URL || "") +
-                    process.env.EXPO_PUBLIC_COVER_PATH +
-                    release.cover,
+                  uri: (apiUrl || "") + coverPath + release.cover,
                 }
               : undefined
           }

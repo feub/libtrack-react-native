@@ -1,11 +1,12 @@
 import React from "react";
 import { Stack } from "expo-router";
-import { View, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 
 export default function RootLayout() {
   return (
-    <>
+    <SafeAreaView style={styles.safeArea}>
       <Stack
         screenOptions={{
           headerStyle: {
@@ -25,28 +26,25 @@ export default function RootLayout() {
             headerBlurEffect: "dark",
           }}
         />
-        <View style={styles.container}>
-          <Stack.Screen
-            name="login"
-            options={{
-              title: "Login",
-              headerShown: false,
-              headerTransparent: true,
-              headerBlurEffect: "dark",
-            }}
-          />
-        </View>
+        <Stack.Screen
+          name="login"
+          options={{
+            title: "Login",
+            headerShown: false,
+            headerTransparent: true,
+            headerBlurEffect: "dark",
+          }}
+        />
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="light" />
-    </>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
+    backgroundColor: "#111113",
   },
 });

@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
+import { axiosInstance } from "@/services/axios";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { ReleasesType } from "@/types/releaseTypes";
 import ReleaseListItem from "@/components/ReleaseListItem";
@@ -17,6 +17,8 @@ import RectangleButton from "@/components/RectangleButton";
 import MyText from "@/components/MyText";
 import SearchTerm from "@/components/SearchTerm";
 
+const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+const releaseListEndpoint = apiUrl + "/api/release/list";
 export default function Releases() {
   const [releases, setReleases] = useState<ReleasesType[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -30,19 +32,14 @@ export default function Releases() {
     setLoading(true);
 
     try {
-      const token = await AsyncStorage.getItem("userToken");
+      // const token = await AsyncStorage.getItem("userToken");
 
-      const response = await axios.get(
-        `${process.env.EXPO_PUBLIC_API_URL}/api/release/list`,
-        {
-          params: { page, search: searchTerm },
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-            Authorization: `Bearer ${token}`,
-          },
+      const response = await axiosInstance.get(releaseListEndpoint, {
+        params: { page, search: searchTerm },
+        headers: {
+          // Authorization: `Bearer ${token}`,
         },
-      );
+      });
 
       const responseData = response.data as {
         type: string;
@@ -60,7 +57,7 @@ export default function Releases() {
     } catch (error: any) {
       Alert.alert(
         "API Error",
-        "Server not reachable. Please try again later.",
+        "Server not reachable. Please try again later.\n" + error,
         [{ text: "OK" }],
       );
     } finally {
