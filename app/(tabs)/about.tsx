@@ -1,22 +1,32 @@
+import { useState } from "react";
 import { Text, View, StyleSheet } from "react-native";
 import { Image } from "react-native";
 import icon from "@/assets/images/splash-icon.png";
 import MyText from "@/components/MyText";
 import LogoutButton from "@/components/LogoutButton";
+import { Pressable } from "react-native";
 
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
 export default function About() {
+  const [showEndpointUrl, setShowEndpointUrl] = useState<boolean>(false);
+
   return (
     <View style={styles.container}>
-      <Image source={icon} style={{ width: 100, height: 100 }} />
+      <Pressable onPress={() => setShowEndpointUrl(!showEndpointUrl)}>
+        <Image source={icon} style={{ width: 100, height: 100 }} />
+      </Pressable>
       <Text style={styles.title}>About LibTrack</Text>
       <MyText style={styles.paragraph}>
         Catalog your collections (CDs, vinyl, books, & more!) and rediscover
         your treasures.
       </MyText>
       <LogoutButton />
-      <MyText style={{ color: "#f1f1f1" }}>API: {apiUrl}</MyText>
+      {showEndpointUrl && (
+        <MyText style={{ color: "#444444", marginTop: 14 }}>
+          API: {apiUrl}
+        </MyText>
+      )}
     </View>
   );
 }

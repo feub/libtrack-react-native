@@ -1,21 +1,21 @@
 import { Tabs } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-// import useAuth from "@/hooks/useAuth";
-// import { useRouter } from "expo-router";
+import useAuth from "@/hooks/useAuth";
+import { useRouter } from "expo-router";
 
 export default function TabLayout() {
-  // const isAuthenticated = useAuth();
-  // const router = useRouter();
+  const isAuthenticated = useAuth();
+  const router = useRouter();
 
-  // if (isAuthenticated === null) {
-  //   return null;
-  // }
+  if (isAuthenticated === null) {
+    return null;
+  }
 
-  // if (!isAuthenticated) {
-  //   router.replace("../login");
-  //   return null;
-  // }
+  if (!isAuthenticated) {
+    router.replace("../login");
+    return null;
+  }
 
   return (
     <Tabs

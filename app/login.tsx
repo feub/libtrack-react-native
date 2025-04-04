@@ -28,13 +28,11 @@ const Login = () => {
         password,
       });
 
-      console.log("LOGIN: ", response.data);
-
       const { user, token } = response.data as { user: string; token: string };
 
       await AsyncStorage.setItem("userToken", token);
 
-      Alert.alert("👍 Login Successful", `Welcome ${user}! 👋 ${token}`);
+      Alert.alert("👍 Login Successful", `Welcome ${user}! 👋`);
 
       router.replace("/(tabs)");
     } catch (error: any) {

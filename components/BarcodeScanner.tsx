@@ -37,18 +37,18 @@ function BarcodeScanner({ onScanComplete }: BarcodeScannerProps) {
     setLoading(true);
 
     try {
-      // const token = await AsyncStorage.getItem("userToken");
+      const token = await AsyncStorage.getItem("userToken");
 
       const response = await axiosInstance.post(
         scanAddEndpoint,
         {
           barcode: data,
         },
-        // {
-        //   headers: {
-        //     Authorization: `Bearer ${token}`,
-        //   },
-        // },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
       );
 
       const responseData = response.data as ScanResponseType;

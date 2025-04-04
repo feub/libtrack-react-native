@@ -32,12 +32,12 @@ export default function Releases() {
     setLoading(true);
 
     try {
-      // const token = await AsyncStorage.getItem("userToken");
+      const token = await AsyncStorage.getItem("userToken");
 
       const response = await axiosInstance.get(releaseListEndpoint, {
         params: { page, search: searchTerm },
         headers: {
-          // Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 

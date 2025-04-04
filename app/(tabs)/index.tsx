@@ -33,11 +33,11 @@ export default function Index() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        //const token = await AsyncStorage.getItem("userToken");
+        const token = await AsyncStorage.getItem("userToken");
 
         const response = await axiosInstance.get(healthEndpoint, {
           headers: {
-            // Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         });
 
@@ -66,7 +66,7 @@ export default function Index() {
     setLoading(true);
 
     try {
-      // const token = await AsyncStorage.getItem("userToken");
+      const token = await AsyncStorage.getItem("userToken");
 
       const response = await axiosInstance.post(
         scanAddEndpoint,
@@ -76,7 +76,7 @@ export default function Index() {
         },
         {
           headers: {
-            // Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         },
       );
