@@ -16,7 +16,7 @@ import CircleButton from "@/components/CircleButton";
 import ScannedReleaseListItem from "@/components/ScannedReleaseListItem";
 
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
-const healthEndpoint = apiUrl + "/api/release/health";
+const healthEndpoint = apiUrl + "/api/health";
 const scanAddEndpoint = apiUrl + "/api/release/scan/add";
 export default function Index() {
   const [scannedData, setScannedData] = useState<ScanResponseType | null>(null);
