@@ -1,6 +1,8 @@
 export type ScanResponseType = {
-  barcode: string;
-  releases?: Array<ReleasesType>;
+  data: {
+    barcode: string;
+    releases?: Array<ReleasesType>;
+  };
 };
 
 export type ArtistType = {

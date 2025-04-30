@@ -8,8 +8,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { axiosInstance } from "@/services/axios";
+import axios from "axios";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { ReleasesType } from "@/types/releaseTypes";
 import ReleaseListItem from "@/components/ReleaseListItem";
@@ -18,7 +17,8 @@ import MyText from "@/components/MyText";
 import SearchTerm from "@/components/SearchTerm";
 
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
-const releaseListEndpoint = apiUrl + "/api/release/list";
+const releaseListEndpoint = apiUrl + "/api/release/";
+
 export default function Releases() {
   const [releases, setReleases] = useState<ReleasesType[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -32,29 +32,33 @@ export default function Releases() {
     setLoading(true);
 
     try {
-      const token = await AsyncStorage.getItem("userToken");
-
-      const response = await axiosInstance.get(releaseListEndpoint, {
+      const response = await axios.get(releaseListEndpoint, {
         params: { page, search: searchTerm },
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
       });
 
       const responseData = response.data as {
         type: string;
-        releases: any;
-        maxPage: number;
-        page: number;
-        totalReleases: number;
+        data: {
+          releases: any;
+          maxPage: number;
+          page: number;
+          totalReleases: number;
+        };
       };
 
       if (responseData.type === "success") {
-        setReleases(responseData.releases);
-        setMaxPage(responseData.maxPage);
-        setTotalReleases(responseData.totalReleases);
+        setReleases(responseData.data.releases);
+        setMaxPage(responseData.data.maxPage);
+        setTotalReleases(responseData.data.totalReleases);
       }
     } catch (error: any) {
+      console.error("API Error:", error);
+      console.error("Error message:", error.message);
+      if (error.response) {
+        console.error("Error response data:", error.response.data);
+        console.error("Error response status:", error.response.status);
+      }
+
       Alert.alert(
         "API Error",
         "Server not reachable. Please try again later.\n" + error,

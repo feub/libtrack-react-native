@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Text, View, StyleSheet, Alert, ActivityIndicator } from "react-native";
 import { Camera, CameraView } from "expo-camera";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { axiosInstance } from "@/services/axios";
+import axios from "axios";
 import { ScanResponseType } from "@/types/releaseTypes";
 import CircleButton from "./CircleButton";
 
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
-const scanAddEndpoint = apiUrl + "/api/release/scan";
+const scanEndpoint = apiUrl + "/api/release/scan";
 
 type BarCodeEvent = {
   type: string;
@@ -37,23 +36,16 @@ function BarcodeScanner({ onScanComplete }: BarcodeScannerProps) {
     setLoading(true);
 
     try {
-      const token = await AsyncStorage.getItem("userToken");
-
-      const response = await axiosInstance.post(
-        scanAddEndpoint,
-        {
-          barcode: data,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+      const response = await axios.post(scanEndpoint, {
+        barcode: data,
+      });
 
       const responseData = response.data as ScanResponseType;
 
-      if (responseData.releases && responseData.releases?.length > 0) {
+      if (
+        responseData.data.releases &&
+        responseData.data.releases?.length > 0
+      ) {
         onScanComplete(responseData);
       } else {
         onScanComplete(null);

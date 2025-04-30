@@ -6,8 +6,7 @@ import {
   ActivityIndicator,
   ScrollView,
 } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { axiosInstance } from "@/services/axios";
+import axios from "axios";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { ScanResponseType } from "@/types/releaseTypes";
 import BarcodeScanner from "@/components/BarcodeScanner";
@@ -18,6 +17,7 @@ import ScannedReleaseListItem from "@/components/ScannedReleaseListItem";
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 const healthEndpoint = apiUrl + "/api/health";
 const scanAddEndpoint = apiUrl + "/api/release/scan/add";
+
 export default function Index() {
   const [scannedData, setScannedData] = useState<ScanResponseType | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -33,11 +33,9 @@ export default function Index() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = await AsyncStorage.getItem("userToken");
-
-        const response = await axiosInstance.get(healthEndpoint, {
+        const response = await axios.get(healthEndpoint, {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: undefined,
           },
         });
 
@@ -49,8 +47,17 @@ export default function Index() {
             `Server not reachable. Please try again later.\n${healthEndpoint}`,
             [{ text: "OK" }],
           );
+        } else {
+          console.log("healthy API");
         }
       } catch (error: any) {
+        console.error("API Error:", error);
+        console.error("Error message:", error.message);
+        if (error.response) {
+          console.error("Error response data:", error.response.data);
+          console.error("Error response status:", error.response.status);
+        }
+
         Alert.alert(
           "API Error",
           `Server not reachable. Please try again later.\n${healthEndpoint}`,
@@ -66,20 +73,10 @@ export default function Index() {
     setLoading(true);
 
     try {
-      const token = await AsyncStorage.getItem("userToken");
-
-      const response = await axiosInstance.post(
-        scanAddEndpoint,
-        {
-          barcode: barcode,
-          release_id: release_id,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+      const response = await axios.post(scanAddEndpoint, {
+        barcode: barcode,
+        release_id: release_id,
+      });
 
       type AddReleaseType = {
         message: string;
@@ -95,6 +92,13 @@ export default function Index() {
         Alert.alert("🧐", responseData.message, [{ text: "OK" }]);
       }
     } catch (error: any) {
+      console.error("API Error:", error);
+      console.error("Error message:", error.message);
+      if (error.response) {
+        console.error("Error response data:", error.response.data);
+        console.error("Error response status:", error.response.status);
+      }
+
       if (error.response) {
         const errorMessage =
           error.response.data.message ||
@@ -118,15 +122,15 @@ export default function Index() {
         <>
           <View style={styles.resultsContainer}>
             <MyText style={styles.dataTextTitle}>
-              Barcode: {scannedData.barcode}
+              Barcode: {scannedData.data.barcode}
             </MyText>
             <ScrollView style={{ maxHeight: 550 }}>
-              {scannedData.releases &&
-                scannedData.releases.map((release, index) => (
+              {scannedData.data.releases &&
+                scannedData.data.releases.map((release, index) => (
                   <ScannedReleaseListItem
                     key={index.toString()}
                     release={release}
-                    barcode={scannedData.barcode}
+                    barcode={scannedData.data.barcode}
                     handleAddRelease={handleAddRelease}
                   />
                 ))}

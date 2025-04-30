@@ -1,26 +1,25 @@
-import { Tabs } from "expo-router";
+import { useEffect } from "react";
+import { Tabs, useRouter } from "expo-router";
+import { useAuth } from "@/context/AuthContext";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import useAuth from "@/hooks/useAuth";
-import { useRouter } from "expo-router";
 
 export default function TabLayout() {
-  const isAuthenticated = useAuth();
+  const { authState } = useAuth();
   const router = useRouter();
 
-  if (isAuthenticated === null) {
-    return null;
-  }
-
-  if (!isAuthenticated) {
-    router.replace("../login");
-    return null;
-  }
+  useEffect(() => {
+    // Redirect if not authenticated
+    if (authState && authState.authenticated === false) {
+      router.replace("/login");
+    }
+  }, [authState, router]);
 
   return (
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: "#f97316",
+        tabBarInactiveTintColor: "#71717a",
         headerStyle: {
           backgroundColor: "#111113",
         },
@@ -28,6 +27,7 @@ export default function TabLayout() {
         headerTintColor: "#fff",
         tabBarStyle: {
           backgroundColor: "#111113",
+          borderTopColor: "#27272a",
         },
         headerTitleStyle: {
           fontFamily: "Quicksand_700Bold",
@@ -48,9 +48,6 @@ export default function TabLayout() {
               size={24}
             />
           ),
-          headerTitleStyle: {
-            fontFamily: "Quicksand_700Bold",
-          },
         }}
       />
       <Tabs.Screen
@@ -73,9 +70,6 @@ export default function TabLayout() {
               size={24}
             />
           ),
-          headerTitleStyle: {
-            fontFamily: "Quicksand_700Bold",
-          },
         }}
       />
     </Tabs>

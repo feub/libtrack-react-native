@@ -7,6 +7,8 @@ const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 const coverPath = process.env.EXPO_PUBLIC_COVER_PATH;
 
 function ReleaseListItem({ release }: { release: ListReleasesType }) {
+  console.log(release);
+
   return (
     <View key={release.id.toString()} style={styles.resultItemContainer}>
       <View style={styles.itemLeft}>
