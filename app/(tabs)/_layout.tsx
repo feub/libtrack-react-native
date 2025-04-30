@@ -43,7 +43,7 @@ export default function TabLayout() {
           backgroundColor: "#111113",
         }}
       >
-        <ActivityIndicator size="large" color="#f97316" />
+        <ActivityIndicator size="large" color="#afb42b" />
       </View>
     );
   }
@@ -51,8 +51,8 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: "#f97316",
-        tabBarInactiveTintColor: "#71717a",
+        tabBarActiveTintColor: "#afb42b",
+        tabBarInactiveTintColor: "#606043",
         headerStyle: {
           backgroundColor: "#111113",
         },

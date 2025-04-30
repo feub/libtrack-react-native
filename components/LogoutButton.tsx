@@ -1,5 +1,6 @@
 import React from "react";
-import { Pressable, Alert, StyleSheet } from "react-native";
+import { Alert, StyleSheet } from "react-native";
+import { Button } from "react-native-paper";
 import { useRouter } from "expo-router";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import MyText from "./MyText";
@@ -18,10 +19,13 @@ const LogoutButton = () => {
   };
 
   return (
-    <Pressable style={styles.buttonContainer} onPress={handleLogout}>
-      <MyText style={styles.logoutBtn}>Logout</MyText>
-      <MaterialIcons name="logout" size={16} color="#25292e" />
-    </Pressable>
+    <Button icon="logout" mode="outlined" onPress={handleLogout}>
+      Logout
+    </Button>
+    // <Pressable style={styles.buttonContainer} onPress={handleLogout}>
+    //   <MyText style={styles.logoutBtn}>Logout</MyText>
+    //   <MaterialIcons name="logout" size={16} color="#25292e" />
+    // </Pressable>
   );
 };
 

@@ -1,16 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
-import { View, Alert, StyleSheet, Pressable } from "react-native";
+import { View, Alert, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { useAuth } from "@/context/AuthContext";
 import { TextInput, Button } from "react-native-paper";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import MyText from "@/components/MyText";
 
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
 const Login = () => {
   const [email, setEmail] = useState<string>("fabien@feub.net");
-  const [password, setPassword] = useState<string>("Harfan975");
+  const [password, setPassword] = useState<string>(
+    (process.env.EXPO_PUBLIC_PWD || "").toString(),
+  );
   const [showPassword, setShowPassword] = useState<boolean>(true);
   const emailInputRef = useRef<any>(null);
   const router = useRouter();
