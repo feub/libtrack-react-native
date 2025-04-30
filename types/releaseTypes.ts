@@ -1,20 +1,12 @@
 export type ScanResponseType = {
   data: {
     barcode: string;
-    releases?: Array<ReleasesType>;
+    releases?: Array<ScanReleaseType>;
   };
 };
 
-export type ArtistType = {
-  name: string;
-};
-
-export type CoverType = {
-  formats: string;
-};
-
-export type ReleasesType = {
-  id: string;
+export type ScanReleaseType = {
+  id: number;
   title?: string;
   artists?: ArtistType[];
   images?: [
@@ -30,10 +22,28 @@ export type ReleasesType = {
   ];
 };
 
-export type ListReleasesType = {
-  id: string;
+export type ArtistType = {
+  id: number;
+  name: string;
+};
+
+export type CoverType = {
+  formats: string;
+};
+
+export type ListReleaseType = {
+  id: number;
   title?: string;
-  artists?: ArtistType[];
-  cover?: CoverType[];
   release_date?: string;
+  cover?: string;
+  barcode?: string;
+  artists?: ArtistType[];
+  shelf: {
+    id: number;
+    location: string;
+  };
+  format: {
+    id: number;
+    name: string;
+  };
 };

@@ -1,12 +1,12 @@
 import React from "react";
 import { Image, View, StyleSheet } from "react-native";
-import { ListReleasesType } from "@/types/releaseTypes";
+import { ListReleaseType } from "@/types/releaseTypes";
 import MyText from "@/components/MyText";
 
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 const coverPath = process.env.EXPO_PUBLIC_COVER_PATH;
 
-function ReleaseListItem({ release }: { release: ListReleasesType }) {
+function ReleaseListItem({ release }: { release: ListReleaseType }) {
   return (
     <View key={release.id.toString()} style={styles.resultItemContainer}>
       <View style={styles.itemLeft}>
@@ -18,7 +18,17 @@ function ReleaseListItem({ release }: { release: ListReleasesType }) {
           </>
         )}
         <MyText style={styles.dataText}>{release.title}</MyText>
-        <MyText style={styles.dataText}>Date: {release.release_date}</MyText>
+        {release.release_date && (
+          <MyText style={styles.dataText}>Date: {release.release_date}</MyText>
+        )}
+        {release.format && (
+          <MyText style={styles.dataText}>Format: {release.format.name}</MyText>
+        )}
+        {release.shelf && (
+          <MyText style={styles.dataText}>
+            Shelf: {release.shelf.location}
+          </MyText>
+        )}
       </View>
       {release.cover ? (
         <Image
