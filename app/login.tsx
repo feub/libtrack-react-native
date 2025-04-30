@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
-import { View, TextInput, Alert, StyleSheet, Pressable } from "react-native";
+import { View, Alert, StyleSheet, Pressable } from "react-native";
 import { useRouter } from "expo-router";
 import { useAuth } from "@/context/AuthContext";
+import { TextInput, Button } from "react-native-paper";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import MyText from "@/components/MyText";
 
@@ -9,8 +10,9 @@ const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
 const Login = () => {
   const [email, setEmail] = useState<string>("fabien@feub.net");
-  const [password, setPassword] = useState<string>("Harfan975$");
-  const emailInputRef = useRef<TextInput>(null);
+  const [password, setPassword] = useState<string>("Harfan975");
+  const [showPassword, setShowPassword] = useState<boolean>(true);
+  const emailInputRef = useRef<any>(null);
   const router = useRouter();
   const { onLogin, authState } = useAuth();
 
@@ -47,6 +49,7 @@ const Login = () => {
       <MyText style={styles.title}>Sign in</MyText>
       <MyText style={{ color: "#f1f1f1" }}>API: {apiUrl}</MyText>
       <TextInput
+        label="Email"
         ref={emailInputRef}
         placeholder="Email"
         value={email}
@@ -55,21 +58,32 @@ const Login = () => {
         style={styles.input}
       />
       <TextInput
+        label="Pasword"
         placeholder="Password"
         value={password}
         onChangeText={setPassword}
-        secureTextEntry
+        secureTextEntry={showPassword}
         style={styles.input}
+        right={
+          <TextInput.Icon
+            icon="eye"
+            onPress={() => setShowPassword(!showPassword)}
+          />
+        }
       />
 
-      <Pressable style={styles.buttonContainer} onPress={handleLogin}>
-        <MyText style={styles.loginBtn}>Login</MyText>
-        <MaterialIcons name="login" size={16} color="#25292e" />
-      </Pressable>
+      <Button
+        icon="login"
+        mode="contained"
+        onPress={handleLogin}
+        style={{ marginBottom: 6 }}
+      >
+        Login
+      </Button>
 
-      <Pressable style={styles.buttonContainer} onPress={goToIndex}>
-        <MyText>Go to index</MyText>
-      </Pressable>
+      <Button mode="outlined" onPress={goToIndex}>
+        Go to index
+      </Button>
     </View>
   );
 };
@@ -91,23 +105,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
   },
   input: {
-    color: "#000000",
-    backgroundColor: "#f97316",
-    padding: 10,
-    borderRadius: 12,
-    marginBottom: 16,
+    marginVertical: 14,
     width: "100%",
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#f97316",
-    borderRadius: 12,
-    padding: 10,
-  },
-  loginBtn: {
-    marginRight: 6,
-    fontWeight: "bold",
   },
 });
