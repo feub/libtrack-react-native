@@ -32,35 +32,10 @@ const Login = () => {
       const result = await onLogin(email, password);
 
       if (result && result.error) {
-        alert("Error: " + result.msg);
+        Alert.alert("Login Failed: ", result.msg);
         console.log("Error: ", result.msg);
-      } else {
-        alert("logged in");
-        console.log(result.token);
       }
     }
-
-    // try {
-    //   const response = await axiosInstance.post(loginEndpoint, {
-    //     username: email,
-    //     password,
-    //   });
-    //   const { user, token } = response.data as { user: string; token: string };
-    //   await AsyncStorage.setItem("userToken", token);
-    //   Alert.alert("👍 Login Successful", `Welcome ${user}! 👋`);
-    //   router.replace("/(tabs)");
-    // } catch (error: any) {
-    //   if (error.response) {
-    //     console.log("if error.response", error.response);
-    //     Alert.alert(
-    //       "Login Failed",
-    //       error.response.data.message || "An error occurred",
-    //     );
-    //   } else {
-    //     console.log("else", error);
-    //     Alert.alert("Login Failed", "Network error occurred");
-    //   }
-    // }
   };
 
   const goToIndex = () => {
