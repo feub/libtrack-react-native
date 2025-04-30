@@ -92,13 +92,6 @@ export default function Index() {
         Alert.alert("🧐", responseData.message, [{ text: "OK" }]);
       }
     } catch (error: any) {
-      console.error("API Error:", error);
-      console.error("Error message:", error.message);
-      if (error.response) {
-        console.error("Error response data:", error.response.data);
-        console.error("Error response status:", error.response.status);
-      }
-
       if (error.response) {
         const errorMessage =
           error.response.data.message ||
