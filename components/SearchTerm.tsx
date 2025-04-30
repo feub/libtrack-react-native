@@ -1,14 +1,8 @@
 import React from "react";
 import { useForm, Controller } from "react-hook-form";
+import { TextInput } from "react-native-paper";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import {
-  SafeAreaView,
-  View,
-  StyleSheet,
-  TextInput,
-  Text,
-  Pressable,
-} from "react-native";
+import { SafeAreaView, View, StyleSheet, Text, Pressable } from "react-native";
 
 type SearchTermType = {
   searchTerm: string;
@@ -63,8 +57,10 @@ export default function SearchTerm({ onSubmit }: SearchFormProps) {
             defaultValue=""
             render={({ field: { onChange, onBlur, value } }) => (
               <TextInput
+                label="Search"
+                mode="outlined"
                 style={styles.input}
-                placeholder="Search..."
+                // placeholder="Search..."
                 onBlur={onBlur}
                 onChangeText={onChange}
                 value={value}
@@ -77,6 +73,7 @@ export default function SearchTerm({ onSubmit }: SearchFormProps) {
               <MaterialIcons name="cancel" size={16} color="#25292e" />
             </Pressable>
           )}
+
           <Pressable style={styles.button} onPress={handleSubmit(onSubmitForm)}>
             <MaterialIcons name="search" size={16} color="#25292e" />
           </Pressable>
@@ -100,11 +97,6 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    color: "#000000",
-    backgroundColor: "#f97316",
-    borderWidth: 1,
-    padding: 10,
-    borderRadius: 12,
     marginRight: 10,
     minWidth: 150,
   },
@@ -112,13 +104,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f97316",
+    backgroundColor: "#afb42b",
     borderRadius: 12,
     padding: 10,
   },
   buttonCancel: {
     position: "absolute",
-    right: 60,
+    right: 70,
     fontWeight: "bold",
     zIndex: 100,
   },
