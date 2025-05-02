@@ -61,12 +61,25 @@ export const AuthProvider = ({ children }: any) => {
     const loadToken = async () => {
       const token = await SecureStore.getItemAsync(TOKEN_KEY);
       const expiresAt = await SecureStore.getItemAsync(TOKEN_EXPIRY_KEY);
-      console.log("stored token: ", token);
-      console.log("token expires at: ", expiresAt);
+      console.log("AuthContex ~ stored token: ", token);
+      console.log("AuthContex ~ token expires at: ", expiresAt);
 
       if (token && expiresAt) {
         if (new Date(expiresAt) <= new Date()) {
-          console.log("Stored token has expired, logging out");
+          console.log(
+            "AuthContext ~ Stored token has expired, attempting to refresh",
+          );
+          try {
+            const newToken = await refreshToken();
+            if (newToken) {
+              console.log("AuthContex ~ Successfully refreshed token");
+              return;
+            }
+          } catch (error) {
+            console.log("AuthContext ~ Failed to refresh token:", error);
+            await logout();
+            return;
+          }
           await logout();
           return;
         }
@@ -145,17 +158,29 @@ export const AuthProvider = ({ children }: any) => {
         async (error) => {
           if (error.response && error.response.status === 401) {
             const originalRequest = error.config;
+            // Check if we haven't already tried refreshing the token for this request
             if (!originalRequest._retry) {
               console.log("AuthContex ~ Attempting refreshing token");
               originalRequest._retry = true;
-              const newToken = await refreshToken();
-              if (newToken) {
-                console.log("AuthContex ~ Token refreshed:", newToken);
-                originalRequest.headers["Authorization"] = `Bearer ${newToken}`;
-                return axios(originalRequest);
+              try {
+                const newToken = await refreshToken();
+                if (newToken) {
+                  console.log("AuthContex ~ Token refreshed:", newToken);
+                  originalRequest.headers[
+                    "Authorization"
+                  ] = `Bearer ${newToken}`;
+                  return axios(originalRequest);
+                }
+              } catch (error) {
+                console.log("AuthContext ~ Failed to refresh token:", error);
+                await logout();
+                return Promise.reject(error);
               }
             }
-            console.log("AuthContex ~ 401 error detected, logging out");
+            // We already tried refreshing the token and it failed
+            console.log(
+              "AuthContext ~ 401 error persists after token refresh, logging out",
+            );
             await logout();
             // Don't navigate here - let components handle navigation
           }
