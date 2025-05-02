@@ -9,6 +9,10 @@ import * as SecureStore from "expo-secure-store";
 import axios from "axios";
 
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+const TOKEN_KEY = "libtrack-jwt";
+const TOKEN_EXPIRY_KEY = "libtrack-jwt-expires";
+const REFRESH_TOKEN_KEY = "libtrack-refresh-token";
+const REFRESH_TOKEN_EXPIRY_KEY = "libtrack-refresh-token-expires";
 
 interface AuthProps {
   authState?: {
@@ -20,9 +24,6 @@ interface AuthProps {
   onLogout?: () => Promise<any>;
   isTokenExpired?: () => boolean;
 }
-
-const TOKEN_KEY = "libtrack-jwt";
-const TOKEN_EXPIRY_KEY = "libtrack-jwt-expires";
 
 const AuthContext = createContext<AuthProps>({});
 
@@ -44,6 +45,8 @@ export const AuthProvider = ({ children }: any) => {
   const logout = useCallback(async () => {
     await SecureStore.deleteItemAsync(TOKEN_KEY);
     await SecureStore.deleteItemAsync(TOKEN_EXPIRY_KEY);
+    await SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY);
+    await SecureStore.deleteItemAsync(REFRESH_TOKEN_EXPIRY_KEY);
 
     axios.defaults.headers.common["Authorization"] = "";
 
@@ -86,6 +89,51 @@ export const AuthProvider = ({ children }: any) => {
     loadToken();
   }, [logout]);
 
+  const refreshToken = async () => {
+    const refreshToken = await SecureStore.getItemAsync(REFRESH_TOKEN_KEY);
+    if (!refreshToken) {
+      logout();
+      return;
+    }
+
+    try {
+      const response = await axios.post(`${apiUrl}/api/token/refresh`, {
+        refreshToken,
+      });
+      const newToken = (response.data as { token: string }).token;
+      const newRefreshToken = (response.data as { refresh_token: string })
+        .refresh_token;
+
+      const newTokenExpiresAt = new Date(
+        new Date().getTime() + 10 * 60 * 1000,
+      ).toISOString(); // 10 minutes
+      const newRefreshTokenExpiresAt = new Date(
+        new Date().getTime() + 30 * 24 * 60 * 60 * 1000,
+      ).toISOString(); // 30 days
+
+      await SecureStore.setItemAsync(TOKEN_KEY, newToken);
+      await SecureStore.setItemAsync(TOKEN_EXPIRY_KEY, newTokenExpiresAt);
+      await SecureStore.setItemAsync(REFRESH_TOKEN_KEY, newRefreshToken);
+      await SecureStore.setItemAsync(
+        REFRESH_TOKEN_EXPIRY_KEY,
+        newRefreshTokenExpiresAt,
+      );
+
+      axios.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
+
+      setAuthState({
+        token: newToken,
+        authenticated: true,
+        expiresAt: newTokenExpiresAt,
+      });
+
+      return newToken;
+    } catch (error) {
+      console.log("Error refreshing token:", error);
+      logout();
+    }
+  };
+
   // Use the interceptor with the stable logout function reference
   useEffect(() => {
     // Remove any existing interceptors
@@ -96,7 +144,18 @@ export const AuthProvider = ({ children }: any) => {
         (response) => response,
         async (error) => {
           if (error.response && error.response.status === 401) {
-            console.log("401 error detected, logging out");
+            const originalRequest = error.config;
+            if (!originalRequest._retry) {
+              console.log("AuthContex ~ Attempting refreshing token");
+              originalRequest._retry = true;
+              const newToken = await refreshToken();
+              if (newToken) {
+                console.log("AuthContex ~ Token refreshed:", newToken);
+                originalRequest.headers["Authorization"] = `Bearer ${newToken}`;
+                return axios(originalRequest);
+              }
+            }
+            console.log("AuthContex ~ 401 error detected, logging out");
             await logout();
             // Don't navigate here - let components handle navigation
           }
@@ -122,8 +181,8 @@ export const AuthProvider = ({ children }: any) => {
     type LoginResponse = {
       token: string;
       token_expires_at: string;
-      // refresh_token: string;
-      // refresh_expires_at: string;
+      refresh_token: string;
+      refresh_expires_at: string;
     };
 
     try {
@@ -139,6 +198,14 @@ export const AuthProvider = ({ children }: any) => {
         result.data.token_expires_at,
       );
       await SecureStore.setItemAsync(TOKEN_KEY, result.data.token);
+      await SecureStore.setItemAsync(
+        REFRESH_TOKEN_KEY,
+        result.data.refresh_token,
+      );
+      await SecureStore.setItemAsync(
+        REFRESH_TOKEN_EXPIRY_KEY,
+        result.data.refresh_expires_at,
+      );
 
       axios.defaults.headers.common[
         "Authorization"
