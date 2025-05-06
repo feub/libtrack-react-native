@@ -6,7 +6,6 @@ import {
   ActivityIndicator,
   ScrollView,
 } from "react-native";
-import * as SecureStore from "expo-secure-store";
 import { api } from "@/utils/apiRequest";
 import Snack from "@/components/Snack";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
@@ -47,14 +46,6 @@ export default function Index() {
           );
         } else {
           console.log("🚀 Healthy API");
-          console.log(
-            "access_token:",
-            await SecureStore.getItemAsync("access_token"),
-          );
-          console.log(
-            "refresh_token:",
-            await SecureStore.getItemAsync("refresh_token"),
-          );
         }
       } catch (error: any) {
         console.error("API Error:", error);
@@ -94,13 +85,10 @@ export default function Index() {
 
       const responseData = await response.json();
 
-      console.log("index.tsx ~ handleAddRelease ~ response:", responseData);
-
       if (responseData.type === "success") {
         setScannedData(null);
         setAfteradded("🤟 Release successfully added!");
         setVisibleSnack(true);
-        // Alert.alert("🤟", "Release successfully added!", [{ text: "OK" }]);
       } else {
         Alert.alert("🧐", responseData.message, [{ text: "OK" }]);
       }

@@ -31,11 +31,6 @@ async function refreshAccessToken(): Promise<boolean> {
         body: JSON.stringify({ refresh_token: refreshToken }),
       });
 
-      console.log(
-        "apiRequest.ts ~ refreshAccessToken ~ response.status",
-        response.status,
-      );
-
       if (!response.ok) {
         let errorMsg = "Refresh failed";
         try {
@@ -56,8 +51,6 @@ async function refreshAccessToken(): Promise<boolean> {
         console.error("Failed to parse refresh token response:", error);
         throw new Error("Invalid server response during token refresh");
       }
-
-      console.log("apiRequest.ts ~ refreshAccessToken ~ data", data);
 
       await SecureStore.setItemAsync("access_token", data.token);
       await SecureStore.setItemAsync("refresh_token", data.refresh_token);
@@ -81,9 +74,6 @@ async function refreshAccessToken(): Promise<boolean> {
 export async function apiRequest(url: string, options: RequestInit = {}) {
   let token = await SecureStore.getItemAsync("access_token");
 
-  console.log("apiRequest.ts ~ url:", url);
-  console.log("apiRequest.ts ~ method:", options.method || "GET");
-
   // Create a deep copy of the options to avoid mutating the original
   const requestOptions = { ...options };
   const headers: HeadersInit = {
@@ -98,35 +88,31 @@ export async function apiRequest(url: string, options: RequestInit = {}) {
 
   try {
     // Log request details for debugging
-    if (requestOptions.body) {
-      try {
-        const bodyContent = JSON.parse(requestOptions.body.toString());
-        console.log(
-          "apiRequest.ts ~ request body structure:",
-          Object.keys(bodyContent).join(", "),
-        );
-      } catch (e) {
-        console.log(
-          "apiRequest.ts ~ request body:",
-          requestOptions.body.toString().substring(0, 100) + "...",
-        );
-      }
-    }
+    // if (requestOptions.body) {
+    //   try {
+    //     const bodyContent = JSON.parse(requestOptions.body.toString());
+    //     console.log(
+    //       "apiRequest.ts ~ request body structure:",
+    //       Object.keys(bodyContent).join(", "),
+    //     );
+    //   } catch (e) {
+    //     console.log(
+    //       "apiRequest.ts ~ request body:",
+    //       requestOptions.body.toString().substring(0, 100) + "...",
+    //     );
+    //   }
+    // }
 
     let response = await fetch(url, {
       ...options,
       headers,
     });
 
-    console.log("apiRequest.ts ~ response status:", response.status);
-
     // Handle 401 unauthorized by attempting to refresh token first
     if (response.status === 401) {
-      console.log("apiRequest.ts ~ 401 detected, refreshing token");
       const refreshSuccessful = await refreshAccessToken();
 
       if (refreshSuccessful) {
-        console.log("apiRequest.ts ~ token refreshed successfully");
         // If refresh was successful, update the token and retry the request
         token = await SecureStore.getItemAsync("access_token");
 
@@ -141,8 +127,6 @@ export async function apiRequest(url: string, options: RequestInit = {}) {
           Authorization: `Bearer ${token}`,
         };
 
-        console.log("apiRequest.ts ~ retrying original request with new token");
-
         // Retry the original request with the new token
         try {
           // Create a fresh request options object
@@ -153,18 +137,9 @@ export async function apiRequest(url: string, options: RequestInit = {}) {
             headers: retryHeaders,
           });
 
-          console.log(
-            "apiRequest.ts ~ retry response status:",
-            response.status,
-          );
-          console.log("apiRequest.ts ~ retry url:", url);
-
           // The key change: Return any response that's not 401
           // This allows 409 and other status codes to be handled by the caller
           if (response.status !== 401) {
-            console.log(
-              "apiRequest.ts ~ Non-401 response received, returning to caller",
-            );
             return response;
           }
         } catch (retryError) {
@@ -179,23 +154,14 @@ export async function apiRequest(url: string, options: RequestInit = {}) {
         if (response.ok) {
           return response;
         }
-
-        console.log(
-          "apiRequest.ts ~ retry failed with status:",
-          response.status,
-        );
       } else {
-        console.log("apiRequest.ts ~ token refresh failed");
+        console.error("apiRequest.ts ~ token refresh failed");
       }
 
       // If we got here, either the refresh failed or the retry failed
       await SecureStore.deleteItemAsync("access_token");
       await SecureStore.deleteItemAsync("refresh_token");
       await SecureStore.deleteItemAsync("user");
-
-      console.log(
-        "apiRequest.ts ~ clearing auth data and redirecting to login",
-      );
 
       router.replace("/login");
       throw new Error("Authentication failed - please login again");

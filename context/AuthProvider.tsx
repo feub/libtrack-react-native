@@ -20,16 +20,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const currentUser = (await SecureStore.getItemAsync("user"))
           ? JSON.parse((await SecureStore.getItemAsync("user")) || "")
           : null;
-
-        console.log(
-          "AuthProvider.tsx ~ AuthProvider ~ access_token: ",
-          currentToken,
-        );
-        console.log(
-          "AuthProvider.tsx ~ AuthProvider ~ refresh_token: ",
-          currentRefreshToken,
-        );
-        console.log("AuthProvider.tsx ~ AuthProvider ~ user: ", currentUser);
       } catch (error) {
         console.error("Error loading authentication data:", error);
       }
