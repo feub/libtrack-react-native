@@ -1,26 +1,19 @@
 import { useEffect, useState } from "react";
 import { Text, View, StyleSheet } from "react-native";
 import { Image } from "react-native";
-import * as SecureStore from "expo-secure-store";
 import icon from "@/assets/images/splash-icon.png";
 import MyText from "@/components/MyText";
 import LogoutButton from "@/components/LogoutButton";
 import { Pressable } from "react-native";
 
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
-const TOKEN_EXPIRY_KEY = "libtrack-jwt-expires";
-const REFRESH_TOKEN_EXPIRY_KEY = "libtrack-refresh-token-expires";
 
 export default function About() {
   const [toggleInfo, setToggleInfo] = useState<boolean>(false);
   const [info, setInfo] = useState<string>("");
 
   const getInfo = async () => {
-    const expiresAt = await SecureStore.getItemAsync(TOKEN_EXPIRY_KEY);
-    const refreshExpiresAt = await SecureStore.getItemAsync(
-      REFRESH_TOKEN_EXPIRY_KEY,
-    );
-    let nfo = `API: ${apiUrl}\ntoken expires at: ${expiresAt}\nrefresh token expires at: ${refreshExpiresAt}`;
+    let nfo = `API endpoint: ${apiUrl}`;
 
     setInfo(nfo);
   };
@@ -41,9 +34,7 @@ export default function About() {
       </MyText>
       <LogoutButton />
       {toggleInfo && (
-        <MyText style={{ color: "#555555", marginTop: 14 }}>
-          Info: {info}
-        </MyText>
+        <MyText style={{ color: "#555555", marginTop: 14 }}>{info}</MyText>
       )}
     </View>
   );

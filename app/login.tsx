@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { View, Alert, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/hooks/useAuth";
 import { TextInput, Button } from "react-native-paper";
 import MyText from "@/components/MyText";
 
@@ -15,14 +15,14 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState<boolean>(true);
   const emailInputRef = useRef<any>(null);
   const router = useRouter();
-  const { onLogin, authState } = useAuth();
+  const { loginUser, user } = useAuth();
 
   // Redirect to tabs if already authenticated
   useEffect(() => {
-    if (authState && authState.authenticated) {
+    if (user) {
       router.replace("/(tabs)");
     }
-  }, [authState, router]);
+  }, [user, router]);
 
   useEffect(() => {
     if (emailInputRef.current) {
@@ -31,13 +31,17 @@ const Login = () => {
   }, []);
 
   const handleLogin = async () => {
-    if (onLogin) {
-      const result = await onLogin(email, password);
-
-      if (result && result.error) {
-        Alert.alert("Login Failed: ", result.msg);
-        console.log("Error: ", result.msg);
-      }
+    try {
+      await loginUser(email, password);
+      router.replace("/(tabs)");
+    } catch (error) {
+      Alert.alert("Login Failed: ");
+      console.log(
+        "Error: ",
+        error instanceof Error
+          ? error.message
+          : "Login failed. Please try again.",
+      );
     }
   };
 

@@ -8,7 +8,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import axios from "axios";
+import { api } from "@/utils/apiRequest";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { ListReleaseType } from "@/types/releaseTypes";
 import ReleaseListItem from "@/components/ReleaseListItem";
@@ -17,7 +17,6 @@ import MyText from "@/components/MyText";
 import SearchTerm from "@/components/SearchTerm";
 
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
-const releaseListEndpoint = apiUrl + "/api/release/";
 
 export default function Releases() {
   const [releases, setReleases] = useState<ListReleaseType[]>([]);
@@ -32,19 +31,30 @@ export default function Releases() {
     setLoading(true);
 
     try {
-      const response = await axios.get(releaseListEndpoint, {
-        params: { page, search: searchTerm },
+      const params = new URLSearchParams({
+        page: page.toString(),
+        search: searchTerm.toString(),
+        limit: "10",
       });
 
-      const responseData = response.data as {
-        type: string;
-        data: {
-          releases: any;
-          maxPage: number;
-          page: number;
-          totalReleases: number;
-        };
-      };
+      const response = await api.get(
+        `${apiUrl}/api/release?${params.toString()}`,
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error(
+          "Error listing releases:",
+          errorData.message || "Unknown error",
+        );
+        Alert.alert("☠️", errorData.message || "Failed to list releases", [
+          { text: "OK" },
+        ]);
+        setLoading(false);
+        return;
+      }
+
+      const responseData = await response.json();
 
       if (responseData.type === "success") {
         setReleases(responseData.data.releases);
@@ -130,7 +140,7 @@ export default function Releases() {
       </View>
       {loading && (
         <View style={styles.loaderContainer}>
-          <ActivityIndicator size="large" color="#fff" />
+          <ActivityIndicator size="large" color="#f97316" />
         </View>
       )}
     </GestureHandlerRootView>

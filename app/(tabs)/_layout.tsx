@@ -1,53 +1,8 @@
-import { useEffect, useState } from "react";
-import { Tabs, useRouter } from "expo-router";
-import { useAuth } from "@/context/AuthContext";
+import { Tabs } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { ActivityIndicator, View } from "react-native";
 
 export default function TabLayout() {
-  const { authState, isTokenExpired } = useAuth();
-  const router = useRouter();
-  const [isAuthChecked, setIsAuthChecked] = useState(false);
-
-  // Check authentication
-  useEffect(() => {
-    const timeOut = setTimeout(() => {
-      if (!authState || !isTokenExpired) {
-        setIsAuthChecked(false);
-        return;
-      }
-
-      if (authState && isTokenExpired) {
-        if (!authState.authenticated || isTokenExpired()) {
-          console.log("Token expired, logging out.");
-          router.replace("/login");
-          return;
-        }
-        setIsAuthChecked(true);
-      }
-    }, 1000);
-
-    return () => {
-      clearTimeout(timeOut);
-    };
-  }, [authState, router, isTokenExpired]);
-
-  if (!isAuthChecked) {
-    return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundColor: "#111113",
-        }}
-      >
-        <ActivityIndicator size="large" color="#afb42b" />
-      </View>
-    );
-  }
-
   return (
     <Tabs
       screenOptions={{

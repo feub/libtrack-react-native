@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Stack } from "expo-router";
+import { Stack, useRouter, useSegments } from "expo-router";
 import { StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
@@ -8,7 +8,8 @@ import {
   PaperProvider,
   MD3LightTheme as DefaultTheme,
 } from "react-native-paper";
-import { AuthProvider, useAuth } from "@/context/AuthContext";
+import { AuthProvider } from "@/context/AuthProvider";
+import { useAuth } from "@/hooks/useAuth";
 
 const theme = {
   ...DefaultTheme,
@@ -57,18 +58,34 @@ const theme = {
   },
 };
 
+// A custom hook for authentication and routing logic
+function useProtectedRoute() {
+  const { token } = useAuth();
+  const segments = useSegments();
+  const router = useRouter();
+
+  useEffect(() => {
+    const inAuthGroup = segments[0] === "(tabs)";
+
+    if (!token && inAuthGroup) {
+      router.replace("/login");
+    } else if (token && segments[0] === "login") {
+      router.replace("/(tabs)");
+    }
+  }, [token, segments, router]);
+}
+
 function AppLayout() {
-  const { authState } = useAuth();
   const [isReady, setIsReady] = useState<boolean>(false);
 
   // Set a small delay to ensure auth state is fully initialized
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsReady(true);
-    }, 500); // Ensure everything is loaded
+    }, 1000); // Ensure everything is loaded
 
     return () => clearTimeout(timer);
-  }, [authState]);
+  }, []);
 
   // Show loading indicator while waiting for auth state
   if (!isReady) {
@@ -117,12 +134,73 @@ function AppLayout() {
 }
 
 export default function RootLayout() {
+  const [isReady, setIsReady] = useState(false);
+
+  // Set a small delay to ensure auth state is fully initialized
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsReady(true);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Show loading indicator while waiting for auth state
+  if (!isReady) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#f97316" />
+      </View>
+    );
+  }
+
   return (
     <AuthProvider>
       <PaperProvider theme={theme}>
-        <AppLayout />
+        <RootLayoutNav />
       </PaperProvider>
     </AuthProvider>
+  );
+}
+
+function RootLayoutNav() {
+  // Use the custom hook for protection logic
+  useProtectedRoute();
+
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <Stack
+        screenOptions={{
+          headerStyle: {
+            backgroundColor: "#f4511e",
+          },
+          headerTintColor: "#fff",
+          headerTitleStyle: {
+            fontWeight: "bold",
+          },
+        }}
+      >
+        <Stack.Screen
+          name="(tabs)"
+          options={{
+            headerShown: false,
+            headerTransparent: true,
+            headerBlurEffect: "dark",
+          }}
+        />
+        <Stack.Screen
+          name="login"
+          options={{
+            title: "Login",
+            headerShown: false,
+            headerTransparent: true,
+            headerBlurEffect: "dark",
+          }}
+        />
+        <Stack.Screen name="+not-found" />
+      </Stack>
+      <StatusBar style="light" />
+    </SafeAreaView>
   );
 }
 

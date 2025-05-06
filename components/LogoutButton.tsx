@@ -4,18 +4,15 @@ import { Button } from "react-native-paper";
 import { useRouter } from "expo-router";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import MyText from "./MyText";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/hooks/useAuth";
 
 const LogoutButton = () => {
-  const { onLogout } = useAuth();
+  const { logoutUser } = useAuth();
   const router = useRouter();
 
   const handleLogout = async () => {
-    if (onLogout) {
-      await onLogout();
-      Alert.alert("👋", "You have been logged out successfully.");
-      router.replace("/login");
-    }
+    await logoutUser();
+    router.replace("/login");
   };
 
   return (

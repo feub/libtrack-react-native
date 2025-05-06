@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Text, View, StyleSheet, Alert, ActivityIndicator } from "react-native";
 import { Camera, CameraView } from "expo-camera";
-import axios from "axios";
-import { ScanResponseType } from "@/types/releaseTypes";
+import { api } from "@/utils/apiRequest";
 import CircleButton from "./CircleButton";
 
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
@@ -36,48 +35,99 @@ function BarcodeScanner({ onScanComplete }: BarcodeScannerProps) {
     setLoading(true);
 
     try {
-      const response = await axios.post(scanEndpoint, {
+      const response = await api.post(scanEndpoint, {
         barcode: data,
       });
 
-      const responseData = response.data as ScanResponseType;
+      if (!response.ok) {
+        let errorMsg = "Unknown error";
 
-      if (
-        responseData.data.releases &&
-        responseData.data.releases?.length > 0
-      ) {
-        onScanComplete(responseData);
-      } else {
-        onScanComplete(null);
+        try {
+          const errorData = await response.json();
+          errorMsg = errorData.message || "Error scanning release";
+        } catch (parseError) {
+          // Handle JSON parse error
+          errorMsg = "Error processing server response";
+          console.error("JSON parse error:", parseError);
+        }
+
+        console.error("Error scanning release:", errorMsg);
+        setLoading(false);
+
+        // Return minimal data for error display
+        onScanComplete({
+          data: {
+            barcode: data,
+            releases: [],
+          },
+          type: "error",
+          message: errorMsg,
+        });
+        return;
+      }
+
+      try {
+        const responseData = await response.json();
+        if (
+          responseData.type === "success" &&
+          responseData.data.releases?.length > 0
+        ) {
+          onScanComplete(responseData);
+        } else {
+          onScanComplete({
+            data: {
+              barcode: data,
+              releases: [],
+            },
+            type: "info",
+            message: "No releases found for this barcode",
+          });
+        }
+      } catch (parseError) {
+        console.error("JSON parse error during success path:", parseError);
+        onScanComplete({
+          data: {
+            barcode: data,
+            releases: [],
+          },
+          type: "error",
+          message: "Error processing search results",
+        });
       }
     } catch (error: any) {
-      Alert.alert("☠️", "Error sending request: " + error, [{ text: "OK" }]);
-
       let errorMessage = "An unexpected error occurred.";
 
-      if (error.response) {
+      if (
+        error.name === "SyntaxError" &&
+        error.message.includes("Unexpected character")
+      ) {
+        errorMessage = "Authentication expired. Please try again.";
+      } else if (error.response) {
         console.error(
           "Server responded with:",
           error.response.status,
           error.response.data,
         );
-        errorMessage = JSON.stringify(error.response.data);
-        Alert.alert("☠️", "Error (response): " + error.response.data, [
-          { text: "OK" },
-        ]);
+        errorMessage =
+          "Server error: " +
+          (typeof error.response.data === "string"
+            ? error.response.data
+            : JSON.stringify(error.response.data));
       } else if (error.request) {
         errorMessage = "No response received from the server.";
-        Alert.alert("☠️", "No response received: " + error.request, [
-          { text: "OK" },
-        ]);
       } else {
-        Alert.alert("☠️", "Error: " + error.message, [{ text: "OK" }]);
+        errorMessage = error.message || "Network error";
       }
 
+      Alert.alert("☠️", errorMessage, [{ text: "OK" }]);
+
       onScanComplete({
-        barcode: data,
-        title: errorMessage.toString(),
-        cover: errorMessage.toString(),
+        data: {
+          barcode: data,
+          releases: [],
+        },
+        type: "error",
+        message: errorMessage,
       });
     } finally {
       setLoading(false);

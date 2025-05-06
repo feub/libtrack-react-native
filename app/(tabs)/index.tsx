@@ -6,7 +6,9 @@ import {
   ActivityIndicator,
   ScrollView,
 } from "react-native";
-import axios from "axios";
+import * as SecureStore from "expo-secure-store";
+import { api } from "@/utils/apiRequest";
+import Snack from "@/components/Snack";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { ScanResponseType } from "@/types/releaseTypes";
 import BarcodeScanner from "@/components/BarcodeScanner";
@@ -15,12 +17,14 @@ import CircleButton from "@/components/CircleButton";
 import ScannedReleaseListItem from "@/components/ScannedReleaseListItem";
 
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
-const healthEndpoint = apiUrl + "/api/health";
-const scanAddEndpoint = apiUrl + "/api/release/scan/add";
 
 export default function Index() {
   const [scannedData, setScannedData] = useState<ScanResponseType | null>(null);
+  const [afteradded, setAfteradded] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [visibleSnack, setVisibleSnack] = useState<boolean>(false);
+
+  const onDismissSnackBar = () => setVisibleSnack(false);
 
   const handleScanComplete = (data: any) => {
     setScannedData(data);
@@ -33,22 +37,24 @@ export default function Index() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(healthEndpoint, {
-          headers: {
-            Authorization: undefined,
-          },
-        });
+        const response = await api.get(`${apiUrl}/api/health`);
 
-        const responseData = response.data as { type: string };
-
-        if (responseData.type !== "success") {
+        if (!response.ok) {
           Alert.alert(
             "API Error",
-            `Server not reachable. Please try again later.\n${healthEndpoint}`,
+            `Server not reachable. Please try again later.\n${apiUrl}/api/health`,
             [{ text: "OK" }],
           );
         } else {
-          console.log("healthy API");
+          console.log("🚀 Healthy API");
+          console.log(
+            "access_token:",
+            await SecureStore.getItemAsync("access_token"),
+          );
+          console.log(
+            "refresh_token:",
+            await SecureStore.getItemAsync("refresh_token"),
+          );
         }
       } catch (error: any) {
         console.error("API Error:", error);
@@ -60,7 +66,7 @@ export default function Index() {
 
         Alert.alert(
           "API Error",
-          `Server not reachable. Please try again later.\n${healthEndpoint}`,
+          `Server not reachable. Please try again later.\n${apiUrl}/api/health`,
           [{ text: "OK" }],
         );
       }
@@ -73,37 +79,44 @@ export default function Index() {
     setLoading(true);
 
     try {
-      const response = await axios.post(scanAddEndpoint, {
+      const response = await api.post(`${apiUrl}/api/release/scan/add`, {
         barcode: barcode,
         release_id: release_id,
       });
 
-      type AddReleaseType = {
-        message: string;
-        type: string;
-      };
+      if (!response.ok) {
+        Alert.alert(
+          "API Error",
+          `Server not reachable. Please try again later.\n${apiUrl}/api/release/scan/add`,
+          [{ text: "OK" }],
+        );
+      }
 
-      const responseData = response.data as AddReleaseType;
+      const responseData = await response.json();
+
+      console.log("index.tsx ~ handleAddRelease ~ response:", responseData);
 
       if (responseData.type === "success") {
         setScannedData(null);
-        Alert.alert("🤟", "Release successfully added!", [{ text: "OK" }]);
+        setAfteradded("🤟 Release successfully added!");
+        setVisibleSnack(true);
+        // Alert.alert("🤟", "Release successfully added!", [{ text: "OK" }]);
       } else {
         Alert.alert("🧐", responseData.message, [{ text: "OK" }]);
       }
     } catch (error: any) {
+      console.error("API Error:", error);
+      console.error("Error message:", error.message);
       if (error.response) {
-        const errorMessage =
-          error.response.data.message ||
-          "Failed to send request. Please try again.";
-        Alert.alert("🧐", errorMessage, [{ text: "OK" }]);
-      } else {
-        Alert.alert(
-          "Network Error",
-          "Failed to send request. Please try again.",
-          [{ text: "OK" }],
-        );
+        console.error("Error response data:", error.response.data);
+        console.error("Error response status:", error.response.status);
       }
+
+      Alert.alert(
+        "API Error",
+        "Server not reachable. Please try again later.\n" + error,
+        [{ text: "OK" }],
+      );
     } finally {
       setLoading(false);
     }
@@ -111,6 +124,11 @@ export default function Index() {
 
   return (
     <View style={styles.container}>
+      {afteradded && (
+        <MyText style={{ color: "#689f38" }}>
+          🤟 Release successfully added!
+        </MyText>
+      )}
       {scannedData ? (
         <>
           <View style={styles.resultsContainer}>
@@ -148,6 +166,9 @@ export default function Index() {
           <BarcodeScanner onScanComplete={handleScanComplete} />
         </>
       )}
+      <Snack visible={visibleSnack} onDismiss={onDismissSnackBar}>
+        Release successfully added!
+      </Snack>
     </View>
   );
 }
