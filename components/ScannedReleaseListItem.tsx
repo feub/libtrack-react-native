@@ -1,5 +1,6 @@
 import React from "react";
 import { View, StyleSheet, Image, Pressable } from "react-native";
+import { Colors, Text } from "react-native-ui-lib";
 import { ScanReleaseType } from "@/types/releaseTypes";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MyText from "@/components/MyText";
@@ -19,7 +20,7 @@ function ScannedReleaseListItem({
         {release.artists && release.artists.length > 0 && (
           <>
             <MyText style={styles.dataText}>
-              Artist(s):{" "}
+              <Text color={Colors.textDown}>Artist(s):</Text>{" "}
               {release.artists
                 .map((artist: { id: number; name: string }) => artist.name)
                 .join(", ")}
@@ -27,15 +28,17 @@ function ScannedReleaseListItem({
           </>
         )}
         <MyText style={styles.dataText}>
-          Title: {release.title ? release.title : "Title not available"}
+          <Text color={Colors.textDown}>Title:</Text>{" "}
+          {release.title ? release.title : "Title not available"}
         </MyText>
         <MyText style={styles.dataText}>
-          Date: {release.year ? release.year : "Date not available"}
+          <Text color={Colors.textDown}>Date:</Text>{" "}
+          {release.year ? release.year : "Date not available"}
         </MyText>
         {release.formats && release.formats.length > 0 && (
           <>
             <MyText style={styles.dataText}>
-              Format:
+              <Text color={Colors.textDown}>Format:</Text>
               {release.formats
                 .map((format: { name: string }) => format.name)
                 .join(", ")}
@@ -64,7 +67,9 @@ function ScannedReleaseListItem({
           resizeMode="cover"
         />
       ) : (
-        <MyText style={styles.dataText}>Cover not available</MyText>
+        <View style={styles.mockImageContainer}>
+          <MyText style={styles.mockImageText}>Not available</MyText>
+        </View>
       )}
     </View>
   );
@@ -81,7 +86,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     color: "#f1f1f1",
-    backgroundColor: "#3f3f46",
+    backgroundColor: "#1E2830",
     marginBottom: 10,
     padding: 8,
     borderRadius: 10,
@@ -96,8 +101,19 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     marginLeft: 4,
   },
+  mockImageContainer: {
+    width: 120,
+    height: 120,
+    borderRadius: 6,
+    backgroundColor: "#20303C",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  mockImageText: {
+    color: Colors.textDowner,
+  },
   plusIcon: {
     marginTop: 20,
-    color: "#afb42b",
+    color: Colors.primary,
   },
 });

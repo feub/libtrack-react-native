@@ -10,13 +10,13 @@ export default function TabLayout() {
         tabBarActiveTintColor: Colors.primary,
         tabBarInactiveTintColor: Colors.primaryInactive,
         headerStyle: {
-          backgroundColor: "#111113",
+          backgroundColor: Colors.background,
         },
-        headerShadowVisible: false,
-        headerTintColor: "#fff",
+        headerShadowVisible: true,
+        headerTintColor: Colors.primary,
         tabBarStyle: {
-          backgroundColor: "#111113",
-          borderTopColor: "#27272a",
+          backgroundColor: Colors.background,
+          borderTopColor: Colors.background,
         },
         headerTitleStyle: {
           fontFamily: "Quicksand_700Bold",

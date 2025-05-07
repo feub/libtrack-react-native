@@ -7,6 +7,7 @@ import {
   ScrollView,
 } from "react-native";
 import { api } from "@/utils/apiRequest";
+import { Colors, Text } from "react-native-ui-lib";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { ScanResponseType } from "@/types/releaseTypes";
 import BarcodeScanner from "@/components/BarcodeScanner";
@@ -117,7 +118,8 @@ export default function Index() {
         <>
           <View style={styles.resultsContainer}>
             <MyText style={styles.dataTextTitle}>
-              Barcode: {scannedData.data.barcode}
+              Barcode:{" "}
+              <Text color={Colors.primary}>{scannedData.data.barcode}</Text>
             </MyText>
             <ScrollView style={{ maxHeight: 550 }}>
               {scannedData.data.releases &&
@@ -144,7 +146,7 @@ export default function Index() {
           <View style={styles.topTextContainer}>
             <View style={styles.textIconContainer}>
               <MaterialIcons name="qr-code-scanner" size={24} color="white" />
-              <MyText style={styles.dataTextScanAnItem}>Scan an item 👇</MyText>
+              <MyText style={styles.dataTextScanAnItem}>Scan a release</MyText>
             </View>
           </View>
           <BarcodeScanner onScanComplete={handleScanComplete} />
