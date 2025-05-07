@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
   },
   fieldStyle: {
     backgroundColor: Colors.background,
-    borderColor: Colors.text,
+    borderColor: "#6E7881",
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: Spacings.s2,
