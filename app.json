@@ -14,7 +14,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#111113"
       },
       "package": "com.feub.libtrackscanner"
     },
@@ -22,6 +22,11 @@
       "bundler": "metro",
       "output": "static",
       "favicon": "assets/images/favicon.png"
+    },
+    "splash": {
+      "image": "assets/images/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#111113"
     },
     "plugins": [
       "expo-router",
@@ -31,7 +36,7 @@
           "image": "assets/images/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
+          "backgroundColor": "#111113"
         }
       ]
     ],
