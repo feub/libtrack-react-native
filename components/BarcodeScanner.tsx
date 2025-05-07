@@ -160,7 +160,7 @@ function BarcodeScanner({ onScanComplete }: BarcodeScannerProps) {
 
         {loading && (
           <View style={styles.loaderContainer}>
-            <ActivityIndicator size="large" color="#fff" />
+            <ActivityIndicator size="large" color={Colors.primary} />
           </View>
         )}
 

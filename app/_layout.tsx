@@ -61,7 +61,7 @@ function AppLayout() {
   if (!isReady) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#f97316" />
+        <ActivityIndicator size="large" color={Colors.primary} />
       </View>
     );
   }
@@ -119,7 +119,7 @@ export default function RootLayout() {
   if (!isReady) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#f97316" />
+        <ActivityIndicator size="large" color={Colors.primary} />
       </View>
     );
   }

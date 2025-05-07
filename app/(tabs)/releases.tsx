@@ -181,7 +181,7 @@ export default function Releases() {
       </View>
       {loading && (
         <View style={styles.loaderContainer}>
-          <ActivityIndicator size="large" color="#afb42b" />
+          <ActivityIndicator size="large" color={Colors.primary} />
         </View>
       )}
     </GestureHandlerRootView>
