@@ -20,6 +20,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const currentUser = (await SecureStore.getItemAsync("user"))
           ? JSON.parse((await SecureStore.getItemAsync("user")) || "")
           : null;
+
+        setToken(currentToken);
+        setRefreshToken(currentRefreshToken);
+        setUser(currentUser);
       } catch (error) {
         console.error("Error loading authentication data:", error);
       }
