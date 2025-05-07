@@ -2,8 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { View, Alert, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { useAuth } from "@/hooks/useAuth";
-import { TextInput, Button } from "react-native-paper";
-import MyText from "@/components/MyText";
+import { Button, Text, TextField, Colors, Spacings } from "react-native-ui-lib";
 
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
@@ -35,7 +34,7 @@ const Login = () => {
       await loginUser(email, password);
       router.replace("/(tabs)");
     } catch (error) {
-      Alert.alert("Login Failed: ");
+      Alert.alert("Login Failed", "Please try again.", [{ text: "OK" }]);
       console.log(
         "Error: ",
         error instanceof Error
@@ -51,44 +50,50 @@ const Login = () => {
 
   return (
     <View style={styles.container}>
-      <MyText style={styles.title}>Sign in</MyText>
-      <MyText style={{ color: "#f1f1f1" }}>API: {apiUrl}</MyText>
-      <TextInput
-        label="Email"
-        ref={emailInputRef}
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        autoCapitalize="none"
-        style={styles.input}
-      />
-      <TextInput
-        label="Pasword"
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry={showPassword}
-        style={styles.input}
-        right={
-          <TextInput.Icon
-            icon="eye"
-            onPress={() => setShowPassword(!showPassword)}
-          />
-        }
+      <Text h2 color={Colors.orange}>
+        Sign in
+      </Text>
+      <Text color={Colors.text}>API: {apiUrl}</Text>
+
+      <View style={styles.inputContainer}>
+        <TextField
+          ref={emailInputRef}
+          placeholder="Email"
+          floatingPlaceholder
+          value={email}
+          onChangeText={setEmail}
+          autoCapitalize="none"
+          style={styles.input}
+          color={Colors.text}
+          fieldStyle={styles.fieldStyle}
+        />
+
+        <TextField
+          placeholder="Password"
+          floatingPlaceholder
+          value={password}
+          onChangeText={setPassword}
+          autoCapitalize="none"
+          secureTextEntry={showPassword}
+          style={styles.input}
+          color={Colors.text}
+          fieldStyle={styles.fieldStyle}
+        />
+      </View>
+
+      <Button
+        label={"Login"}
+        backgroundColor={Colors.primary}
+        onPress={handleLogin}
+        marginB-s2
       />
 
       <Button
-        icon="login"
-        mode="contained"
-        onPress={handleLogin}
-        style={{ marginBottom: 6 }}
-      >
-        Login
-      </Button>
-
-      <Button mode="outlined" onPress={goToIndex}>
-        Go to index
-      </Button>
+        label={"Go to index"}
+        outline
+        outlineColor={Colors.primary}
+        onPress={goToIndex}
+      />
     </View>
   );
 };
@@ -98,19 +103,24 @@ export default Login;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#111113",
-    color: "white",
+    backgroundColor: Colors.background,
     alignItems: "center",
-    padding: 14,
+    padding: Spacings.s4,
   },
-  title: {
-    color: "#ffffff",
-    marginVertical: 10,
-    fontFamily: "Quicksand_700Bold",
-    fontSize: 24,
+  inputContainer: {
+    width: "100%",
+    maxWidth: 400,
+    marginVertical: Spacings.s4,
   },
   input: {
-    marginVertical: 14,
+    marginVertical: Spacings.s4,
     width: "100%",
+  },
+  fieldStyle: {
+    backgroundColor: Colors.background,
+    borderColor: Colors.text,
+    borderWidth: 1,
+    paddingHorizontal: Spacings.s2,
+    borderRadius: 10,
   },
 });

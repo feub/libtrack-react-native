@@ -9,7 +9,9 @@ import {
 } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { api } from "@/utils/apiRequest";
+import { Colors, Text } from "react-native-ui-lib";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { ListReleaseType } from "@/types/releaseTypes";
 import ReleaseListItem from "@/components/ReleaseListItem";
 import RectangleButton from "@/components/RectangleButton";
@@ -121,26 +123,65 @@ export default function Releases() {
               <ReleaseListItem key={index} release={release} />
             ))}
         </ScrollView>
+
         <View style={styles.navBtns}>
-          {currentPage > 1 && (
-            <RectangleButton
-              handleOnPress={() => setCurrentPage(currentPage - 1)}
-            >
-              <Ionicons name="arrow-back-circle" size={24} color="black" />
-            </RectangleButton>
-          )}
-          {currentPage < maxPage && (
-            <RectangleButton
-              handleOnPress={() => setCurrentPage(currentPage + 1)}
-            >
-              <Ionicons name="arrow-forward-circle" size={24} color="black" />
-            </RectangleButton>
-          )}
+          <View style={styles.leftNavBtns}>
+            {currentPage > 1 ? (
+              <>
+                <RectangleButton handleOnPress={() => setCurrentPage(1)}>
+                  <MaterialIcons
+                    name="first-page"
+                    size={24}
+                    color={Colors.primary}
+                  />
+                </RectangleButton>
+                <RectangleButton
+                  handleOnPress={() => setCurrentPage(currentPage - 1)}
+                >
+                  <Ionicons
+                    name="chevron-back"
+                    size={24}
+                    color={Colors.primary}
+                  />
+                </RectangleButton>
+              </>
+            ) : (
+              <View style={styles.placeholderButtons} />
+            )}
+          </View>
+          <View style={styles.rightNavBtns}>
+            {currentPage < maxPage ? (
+              <>
+                <RectangleButton
+                  handleOnPress={() => setCurrentPage(currentPage + 1)}
+                >
+                  <Ionicons
+                    name="chevron-forward"
+                    size={24}
+                    color={Colors.primary}
+                  />
+                </RectangleButton>
+                {currentPage !== maxPage && (
+                  <RectangleButton
+                    handleOnPress={() => setCurrentPage(maxPage)}
+                  >
+                    <MaterialIcons
+                      name="last-page"
+                      size={24}
+                      color={Colors.primary}
+                    />
+                  </RectangleButton>
+                )}
+              </>
+            ) : (
+              <View style={styles.placeholderButtons} />
+            )}
+          </View>
         </View>
       </View>
       {loading && (
         <View style={styles.loaderContainer}>
-          <ActivityIndicator size="large" color="#f97316" />
+          <ActivityIndicator size="large" color="#afb42b" />
         </View>
       )}
     </GestureHandlerRootView>
@@ -162,11 +203,27 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     maxWidth: 600,
   },
+  placeholderButtons: {
+    width: 64,
+    height: 32,
+  },
   navBtns: {
     width: "100%",
     flexDirection: "row",
     justifyContent: "space-between",
     paddingTop: 14,
+    paddingHorizontal: 14,
+    maxWidth: 600,
+  },
+  leftNavBtns: {
+    flexDirection: "row",
+    gap: 8,
+    minWidth: 80,
+  },
+  rightNavBtns: {
+    flexDirection: "row",
+    gap: 8,
+    minWidth: 80,
   },
   dataText: {
     color: "#f1f1f1",

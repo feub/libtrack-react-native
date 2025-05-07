@@ -1,4 +1,5 @@
 import { Tabs } from "expo-router";
+import { Colors } from "react-native-ui-lib";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
@@ -6,8 +7,8 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: "#afb42b",
-        tabBarInactiveTintColor: "#606043",
+        tabBarActiveTintColor: Colors.primary,
+        tabBarInactiveTintColor: Colors.primaryInactive,
         headerStyle: {
           backgroundColor: "#111113",
         },

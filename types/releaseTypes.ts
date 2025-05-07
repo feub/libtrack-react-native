@@ -31,6 +31,11 @@ export type CoverType = {
   formats: string;
 };
 
+export type FormatType = {
+  id: number;
+  name: string;
+};
+
 export type ListReleaseType = {
   id: number;
   title?: string;
@@ -42,8 +47,5 @@ export type ListReleaseType = {
     id: number;
     location: string;
   };
-  format: {
-    id: number;
-    name: string;
-  };
+  format: FormatType;
 };

@@ -7,7 +7,6 @@ import {
   ScrollView,
 } from "react-native";
 import { api } from "@/utils/apiRequest";
-import Snack from "@/components/Snack";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { ScanResponseType } from "@/types/releaseTypes";
 import BarcodeScanner from "@/components/BarcodeScanner";
@@ -21,9 +20,6 @@ export default function Index() {
   const [scannedData, setScannedData] = useState<ScanResponseType | null>(null);
   const [afteradded, setAfteradded] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [visibleSnack, setVisibleSnack] = useState<boolean>(false);
-
-  const onDismissSnackBar = () => setVisibleSnack(false);
 
   const handleScanComplete = (data: any) => {
     setScannedData(data);
@@ -88,7 +84,7 @@ export default function Index() {
       if (responseData.type === "success") {
         setScannedData(null);
         setAfteradded("🤟 Release successfully added!");
-        setVisibleSnack(true);
+        Alert.alert("🤟", "Release successfully added!", [{ text: "OK" }]);
       } else {
         Alert.alert("🧐", responseData.message, [{ text: "OK" }]);
       }
@@ -154,9 +150,6 @@ export default function Index() {
           <BarcodeScanner onScanComplete={handleScanComplete} />
         </>
       )}
-      <Snack visible={visibleSnack} onDismiss={onDismissSnackBar}>
-        Release successfully added!
-      </Snack>
     </View>
   );
 }

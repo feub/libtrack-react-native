@@ -1,5 +1,5 @@
-import React, { Children } from "react";
 import { View, StyleSheet, Pressable } from "react-native";
+import { Colors, Spacings } from "react-native-ui-lib";
 
 interface RectangleButtonProps {
   handleOnPress: () => void;
@@ -28,7 +28,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 12,
-    padding: 10,
-    backgroundColor: "#afb42b",
+    padding: Spacings.s1,
+    // backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
+    borderWidth: 1,
   },
 });

@@ -1,6 +1,6 @@
 import React from "react";
 import { View, StyleSheet, Image, Pressable } from "react-native";
-import { ReleasesType } from "@/types/releaseTypes";
+import { ScanReleaseType } from "@/types/releaseTypes";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MyText from "@/components/MyText";
 
@@ -9,7 +9,7 @@ function ScannedReleaseListItem({
   barcode,
   handleAddRelease,
 }: {
-  release: ReleasesType;
+  release: ScanReleaseType;
   barcode: string;
   handleAddRelease: (barcode: string, releaseId: string) => void;
 }) {
@@ -20,31 +20,31 @@ function ScannedReleaseListItem({
           <>
             <MyText style={styles.dataText}>
               Artist(s):{" "}
-              {release.artists.map((artist) => artist.name).join(", ")}
+              {release.artists
+                .map((artist: { id: number; name: string }) => artist.name)
+                .join(", ")}
             </MyText>
           </>
         )}
         <MyText style={styles.dataText}>
-          Title:{" "}
-          {typeof release.title === "string"
-            ? release.title
-            : "Title not available"}
+          Title: {release.title ? release.title : "Title not available"}
         </MyText>
         <MyText style={styles.dataText}>
-          Date:{" "}
-          {typeof release.year === "string"
-            ? release.year
-            : "Date not available"}
+          Date: {release.year ? release.year : "Date not available"}
         </MyText>
         {release.formats && release.formats.length > 0 && (
           <>
             <MyText style={styles.dataText}>
               Format:
-              {release.formats.map((format) => format.name).join(", ")}
+              {release.formats
+                .map((format: { name: string }) => format.name)
+                .join(", ")}
             </MyText>
           </>
         )}
-        <Pressable onPress={() => handleAddRelease(barcode, release.id)}>
+        <Pressable
+          onPress={() => handleAddRelease(barcode, release.id.toString())}
+        >
           <Ionicons
             name="add-circle-outline"
             size={38}
@@ -98,6 +98,6 @@ const styles = StyleSheet.create({
   },
   plusIcon: {
     marginTop: 20,
-    color: "orange",
+    color: "#afb42b",
   },
 });
