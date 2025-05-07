@@ -29,8 +29,8 @@ export default function About() {
       </Pressable>
       <Text style={styles.title}>About LibTrack</Text>
       <MyText style={styles.paragraph}>
-        Catalog your collections (CDs, vinyl, books, & more!) and rediscover
-        your treasures.
+        Catalog your physical music collections (CDs, vinyl, etc.) and
+        rediscover your treasures.
       </MyText>
       <LogoutButton />
       {toggleInfo && (
@@ -56,8 +56,9 @@ const styles = StyleSheet.create({
   },
   paragraph: {
     color: "#ffffff",
-    fontSize: 18,
+    fontSize: 16,
     paddingHorizontal: 15,
     marginBottom: 10,
+    textAlign: "left",
   },
 });
