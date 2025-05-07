@@ -14,6 +14,8 @@ Colors.loadColors({
   secondary: "#2ecc71",
   error: "#e74c3c",
   text: "#f1f1f1",
+  textDown: "#A6ACB1",
+  textDowner: "#6E7881",
   background: "#111113",
   orange: "#FB6413",
   gold: "#FFD700",
