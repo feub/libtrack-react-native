@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { View, Alert, StyleSheet } from "react-native";
+import { Image } from "react-native";
+import icon from "@/assets/images/splash-icon.png";
 import { useRouter } from "expo-router";
 import { useAuth } from "@/hooks/useAuth";
 import { Button, Text, TextField, Colors, Spacings } from "react-native-ui-lib";
@@ -50,10 +52,10 @@ const Login = () => {
 
   return (
     <View style={styles.container}>
-      <Text h2 color={Colors.orange}>
+      <Image source={icon} style={{ width: 100, height: 100, marginTop: 14 }} />
+      <Text h3 color={Colors.orange}>
         Sign in
       </Text>
-      <Text color={Colors.text}>API: {apiUrl}</Text>
 
       <View style={styles.inputContainer}>
         <TextField
