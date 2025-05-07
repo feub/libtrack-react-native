@@ -1,5 +1,6 @@
 import React from "react";
 import { Image, View, StyleSheet } from "react-native";
+import { Text, Colors } from "react-native-ui-lib";
 import { ListReleaseType } from "@/types/releaseTypes";
 import MyText from "@/components/MyText";
 
@@ -17,16 +18,20 @@ function ReleaseListItem({ release }: { release: ListReleaseType }) {
             </MyText>
           </>
         )}
-        <MyText style={styles.dataText}>{release.title}</MyText>
+        <MyText style={styles.dataTextTitle}>{release.title}</MyText>
         {release.release_date && (
-          <MyText style={styles.dataText}>Date: {release.release_date}</MyText>
+          <MyText style={styles.dataText}>
+            <Text color={Colors.textDown}>Date:</Text> {release.release_date}
+          </MyText>
         )}
         {release.format && (
-          <MyText style={styles.dataText}>Format: {release.format.name}</MyText>
+          <MyText style={styles.dataText}>
+            <Text color={Colors.textDown}>Format:</Text> {release.format.name}
+          </MyText>
         )}
         {release.shelf && (
           <MyText style={styles.dataText}>
-            Shelf: {release.shelf.location}
+            <Text color={Colors.textDown}>Shelf:</Text> {release.shelf.location}
           </MyText>
         )}
       </View>
@@ -88,7 +93,13 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
   },
+  dataTextTitle: {
+    color: "#f1f1f1",
+    fontSize: 14,
+    fontWeight: "bold",
+  },
   dataText: {
     color: "#f1f1f1",
+    fontSize: 12,
   },
 });
