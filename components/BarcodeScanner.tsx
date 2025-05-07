@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Text, View, StyleSheet, Alert, ActivityIndicator } from "react-native";
 import { Camera, CameraView } from "expo-camera";
+import { Colors } from "react-native-ui-lib";
 import { api } from "@/utils/apiRequest";
 import CircleButton from "./CircleButton";
 
@@ -150,13 +151,12 @@ function BarcodeScanner({ onScanComplete }: BarcodeScannerProps) {
             barcodeTypes: ["qr", "ean13"],
           }}
           style={StyleSheet.absoluteFillObject}
-        >
-          <View style={styles.overlay}>
-            <Text style={styles.scanText}>
-              Position barcode within frame to scan
-            </Text>
-          </View>
-        </CameraView>
+        />
+        <View style={styles.overlay}>
+          <Text style={styles.scanText}>
+            Position barcode within frame to scan
+          </Text>
+        </View>
 
         {loading && (
           <View style={styles.loaderContainer}>
@@ -186,12 +186,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   scanText: {
-    fontSize: 18,
-    color: "white",
+    fontSize: 16,
+    color: Colors.text,
+    opacity: 0.4,
     textAlign: "center",
   },
   dataText: {
-    color: "#ffffff",
+    color: Colors.text,
     padding: 10,
   },
   loaderContainer: {
