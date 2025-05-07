@@ -14,12 +14,14 @@ import BarcodeScanner from "@/components/BarcodeScanner";
 import MyText from "@/components/MyText";
 import CircleButton from "@/components/CircleButton";
 import ScannedReleaseListItem from "@/components/ScannedReleaseListItem";
+import MyToast from "@/components/MyToast";
 
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
 export default function Index() {
   const [scannedData, setScannedData] = useState<ScanResponseType | null>(null);
   const [afteradded, setAfteradded] = useState<string | null>(null);
+  const [afteraddedError, setAfteraddedError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
   const handleScanComplete = (data: any) => {
@@ -72,7 +74,7 @@ export default function Index() {
         release_id: release_id,
       });
 
-      if (!response.ok) {
+      if (!response.ok && response.status !== 409) {
         Alert.alert(
           "API Error",
           `Server not reachable. Please try again later.\n${apiUrl}/api/release/scan/add`,
@@ -85,23 +87,25 @@ export default function Index() {
       if (responseData.type === "success") {
         setScannedData(null);
         setAfteradded("🤟 Release successfully added!");
-        Alert.alert("🤟", "Release successfully added!", [{ text: "OK" }]);
+      } else if (responseData.type === "error") {
+        if (responseData.message.includes("already exists")) {
+          setAfteraddedError("📀 " + responseData.message);
+        } else {
+          setAfteraddedError("🧐 " + responseData.message);
+        }
       } else {
-        Alert.alert("🧐", responseData.message, [{ text: "OK" }]);
+        setAfteraddedError("🧐 " + responseData.message);
       }
     } catch (error: any) {
       console.error("API Error:", error);
       console.error("Error message:", error.message);
+
+      setAfteraddedError("🧐 Error connecting to the server");
+
       if (error.response) {
         console.error("Error response data:", error.response.data);
         console.error("Error response status:", error.response.status);
       }
-
-      Alert.alert(
-        "API Error",
-        "Server not reachable. Please try again later.\n" + error,
-        [{ text: "OK" }],
-      );
     } finally {
       setLoading(false);
     }
@@ -109,11 +113,8 @@ export default function Index() {
 
   return (
     <View style={styles.container}>
-      {afteradded && (
-        <MyText style={{ color: "#689f38" }}>
-          🤟 Release successfully added!
-        </MyText>
-      )}
+      {afteradded && <MyToast message={afteradded} type="success" />}
+      {afteraddedError && <MyToast message={afteraddedError} type="danger" />}
       {scannedData ? (
         <>
           <View style={styles.resultsContainer}>
