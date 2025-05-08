@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Text, View, StyleSheet, Alert, ActivityIndicator } from "react-native";
 import { Camera, CameraView } from "expo-camera";
 import { Colors } from "react-native-ui-lib";
 import { api } from "@/utils/apiRequest";
 import CircleButton from "./CircleButton";
+import ErrorBoundary from "./ErrorBoundary";
+import { useIsFocused } from "@react-navigation/native";
 
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 const scanEndpoint = apiUrl + "/api/release/scan";
@@ -17,25 +19,61 @@ type BarcodeScannerProps = {
   onScanComplete: (data: any) => void;
 };
 
-function BarcodeScanner({ onScanComplete }: BarcodeScannerProps) {
+function BarcodeScannerComponent({ onScanComplete }: BarcodeScannerProps) {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [scanned, setScanned] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const isFocused = useIsFocused();
+  const cameraRef = useRef<CameraView>(null);
 
   useEffect(() => {
-    const getBarCodeScannerPermissions = async () => {
-      const { status } = await Camera.requestCameraPermissionsAsync();
-      setHasPermission(status === "granted");
+    let mounted = true;
+
+    const checkCameraPermissions = async () => {
+      if (!mounted) return;
+
+      try {
+        const { status } = await Camera.getCameraPermissionsAsync();
+        if (mounted) {
+          if (status === "granted") {
+            setHasPermission(true);
+          } else if (status === "undetermined") {
+            const { status: newStatus } =
+              await Camera.requestCameraPermissionsAsync();
+            if (mounted) {
+              setHasPermission(newStatus === "granted");
+            }
+          } else {
+            setHasPermission(false);
+          }
+        }
+      } catch (error) {
+        console.error("Error checking camera permissions:", error);
+        if (mounted) {
+          setHasPermission(false);
+        }
+      }
     };
 
-    getBarCodeScannerPermissions();
-  }, []);
+    if (isFocused) {
+      checkCameraPermissions();
+      // Reset scanned state when screen is focused
+      setScanned(false);
+    }
+
+    return () => {
+      mounted = false;
+    };
+  }, [isFocused]);
 
   const handleBarCodeScanned = async ({ type, data }: BarCodeEvent) => {
+    if (scanned) return; // Prevent multiple scans
     setScanned(true);
     setLoading(true);
 
     try {
+      console.log("handleBarCodeScanned ~ about to scan");
+
       const response = await api.post(scanEndpoint, {
         barcode: data,
       });
@@ -47,7 +85,6 @@ function BarcodeScanner({ onScanComplete }: BarcodeScannerProps) {
           const errorData = await response.json();
           errorMsg = errorData.message || "Error scanning release";
         } catch (parseError) {
-          // Handle JSON parse error
           errorMsg = "Error processing server response";
           console.error("JSON parse error:", parseError);
         }
@@ -55,7 +92,6 @@ function BarcodeScanner({ onScanComplete }: BarcodeScannerProps) {
         console.error("Error scanning release:", errorMsg);
         setLoading(false);
 
-        // Return minimal data for error display
         onScanComplete({
           data: {
             barcode: data,
@@ -69,6 +105,8 @@ function BarcodeScanner({ onScanComplete }: BarcodeScannerProps) {
 
       try {
         const responseData = await response.json();
+        console.log("handleBarCodeScanned ~ response: ", responseData);
+
         if (
           responseData.type === "success" &&
           responseData.data.releases?.length > 0
@@ -145,13 +183,16 @@ function BarcodeScanner({ onScanComplete }: BarcodeScannerProps) {
   return (
     <>
       <View style={styles.container}>
-        <CameraView
-          onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
-          barcodeScannerSettings={{
-            barcodeTypes: ["qr", "ean13"],
-          }}
-          style={StyleSheet.absoluteFillObject}
-        />
+        {isFocused && (
+          <CameraView
+            ref={cameraRef}
+            onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
+            barcodeScannerSettings={{
+              barcodeTypes: ["qr", "ean13"],
+            }}
+            style={StyleSheet.absoluteFillObject}
+          />
+        )}
         <View style={styles.overlay}>
           <Text style={styles.scanText}>
             Position barcode within frame to scan
@@ -170,7 +211,23 @@ function BarcodeScanner({ onScanComplete }: BarcodeScannerProps) {
   );
 }
 
-export default BarcodeScanner;
+// Wrap the component with ErrorBoundary
+export default function BarcodeScanner(props: BarcodeScannerProps) {
+  return (
+    <ErrorBoundary
+      fallback={
+        <View style={styles.container}>
+          <Text style={styles.errorText}>
+            Camera error occurred. Please try again.
+          </Text>
+          <CircleButton setScanned={() => {}} />
+        </View>
+      }
+    >
+      <BarcodeScannerComponent {...props} />
+    </ErrorBoundary>
+  );
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -200,5 +257,11 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.6)",
     justifyContent: "center",
     alignItems: "center",
+  },
+  errorText: {
+    color: Colors.error,
+    fontSize: 16,
+    textAlign: "center",
+    marginBottom: 20,
   },
 });
