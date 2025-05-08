@@ -16,7 +16,7 @@ const LogoutButton = () => {
 
   return (
     <Button style={styles.buttonContainer} onPress={handleLogout}>
-      <MaterialIcons name="logout" size={24} color={Colors.background} />{" "}
+      <MaterialIcons name="logout" size={24} color={Colors.background} />
       <Text style={styles.logoutBtn}>Logout</Text>
     </Button>
   );
