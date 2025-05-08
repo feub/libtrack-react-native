@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useLayoutEffect } from "react";
 import {
   View,
   StyleSheet,
@@ -10,13 +10,10 @@ import {
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { api } from "@/utils/apiRequest";
 import { Colors, Text } from "react-native-ui-lib";
-import Ionicons from "@expo/vector-icons/Ionicons";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { ListReleaseType } from "@/types/releaseTypes";
 import ReleaseListItem from "@/components/ReleaseListItem";
-import RectangleButton from "@/components/RectangleButton";
-import MyText from "@/components/MyText";
 import SearchTerm from "@/components/SearchTerm";
+import { useNavigation } from "expo-router";
 
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
@@ -28,8 +25,16 @@ export default function Releases() {
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
+  const [hasMoreData, setHasMoreData] = useState<boolean>(true);
 
-  const fetchData = async (page: number, searchTerm: string = "") => {
+  const navigation = useNavigation();
+
+  const fetchData = async (
+    page: number,
+    searchTerm: string = "",
+    isLoadMore: boolean = false,
+  ) => {
+    if (!hasMoreData && isLoadMore) return;
     setLoading(true);
 
     try {
@@ -59,9 +64,17 @@ export default function Releases() {
       const responseData = await response.json();
 
       if (responseData.type === "success") {
-        setReleases(responseData.data.releases);
+        if (isLoadMore) {
+          setReleases((currentReleases) => [
+            ...currentReleases,
+            ...responseData.data.releases,
+          ]);
+        } else {
+          setReleases(responseData.data.releases);
+        }
         setMaxPage(responseData.data.maxPage);
         setTotalReleases(responseData.data.totalReleases);
+        setHasMoreData(page < responseData.data.maxPage);
       }
     } catch (error: any) {
       console.error("API Error:", error);
@@ -82,22 +95,43 @@ export default function Releases() {
     }
   };
 
+  const loadMoreData = () => {
+    if (!loading && hasMoreData) {
+      const nextPage = currentPage + 1;
+      setCurrentPage(nextPage);
+      fetchData(nextPage, searchTerm, true);
+    }
+  };
+
   useEffect(() => {
-    fetchData(currentPage, searchTerm);
-  }, [currentPage, searchTerm]);
+    // Only fetch when currentPage is 1 (initial load or search)
+    // Other pages are loaded via loadMoreData
+    if (currentPage === 1) {
+      fetchData(1, searchTerm, false);
+    }
+  }, [searchTerm]);
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      title: `My collection (${totalReleases})`,
+    });
+  }, [releases, navigation]);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
+    setCurrentPage(1);
+    setHasMoreData(true);
 
     setTimeout(() => {
-      setRefreshing(false);
-      fetchData(currentPage, searchTerm);
-    }, 2000);
-  }, [currentPage, searchTerm]);
+      // setRefreshing(false);
+      fetchData(1, searchTerm, false);
+    }, 1000);
+  }, [searchTerm]);
 
   const handleSearchSubmit = async (data: { searchTerm: string }) => {
     setSearchTerm(data.searchTerm);
     setCurrentPage(1); // Reset to the first page when searching
+    setHasMoreData(true);
     return Promise.resolve();
   };
 
@@ -105,79 +139,47 @@ export default function Releases() {
     <GestureHandlerRootView>
       <View style={styles.container}>
         <SearchTerm onSubmit={handleSearchSubmit} />
-        <MyText style={styles.dataText}>
-          {totalReleases} releases - page {currentPage}/{maxPage}
-        </MyText>
         <ScrollView
           style={styles.entriesContainer}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
               onRefresh={onRefresh}
-              colors={["#f97316", "#010101"]}
+              colors={[Colors.primary, "#010101"]}
             />
           }
+          onScroll={({ nativeEvent }) => {
+            const { layoutMeasurement, contentOffset, contentSize } =
+              nativeEvent;
+            const isCloseToBottom =
+              layoutMeasurement.height + contentOffset.y >=
+              contentSize.height - 20;
+            if (isCloseToBottom && !loading && hasMoreData) {
+              loadMoreData();
+            }
+          }}
+          scrollEventThrottle={400}
         >
           {releases &&
             releases.map((release, index) => (
               <ReleaseListItem key={index} release={release} />
             ))}
-        </ScrollView>
 
-        <View style={styles.navBtns}>
-          <View style={styles.leftNavBtns}>
-            {currentPage > 1 ? (
-              <>
-                <RectangleButton handleOnPress={() => setCurrentPage(1)}>
-                  <MaterialIcons
-                    name="first-page"
-                    size={24}
-                    color={Colors.primary}
-                  />
-                </RectangleButton>
-                <RectangleButton
-                  handleOnPress={() => setCurrentPage(currentPage - 1)}
-                >
-                  <Ionicons
-                    name="chevron-back"
-                    size={24}
-                    color={Colors.primary}
-                  />
-                </RectangleButton>
-              </>
-            ) : (
-              <View style={styles.placeholderButtons} />
-            )}
-          </View>
-          <View style={styles.rightNavBtns}>
-            {currentPage < maxPage ? (
-              <>
-                <RectangleButton
-                  handleOnPress={() => setCurrentPage(currentPage + 1)}
-                >
-                  <Ionicons
-                    name="chevron-forward"
-                    size={24}
-                    color={Colors.primary}
-                  />
-                </RectangleButton>
-                {currentPage !== maxPage && (
-                  <RectangleButton
-                    handleOnPress={() => setCurrentPage(maxPage)}
-                  >
-                    <MaterialIcons
-                      name="last-page"
-                      size={24}
-                      color={Colors.primary}
-                    />
-                  </RectangleButton>
-                )}
-              </>
-            ) : (
-              <View style={styles.placeholderButtons} />
-            )}
-          </View>
-        </View>
+          {loading && (
+            <View style={styles.loadingMoreContainer}>
+              <ActivityIndicator size="small" color={Colors.primary} />
+              <Text color={Colors.text} style={styles.loadingMoreText}>
+                Loading more...
+              </Text>
+            </View>
+          )}
+
+          {!loading && !hasMoreData && releases.length > 0 && (
+            <Text color={Colors.text} style={styles.endOfResultsText}>
+              The end 🦕
+            </Text>
+          )}
+        </ScrollView>
       </View>
       {loading && (
         <View style={styles.loaderContainer}>
@@ -207,23 +209,18 @@ const styles = StyleSheet.create({
     width: 64,
     height: 32,
   },
-  navBtns: {
-    width: "100%",
+  loadingMoreContainer: {
+    padding: 20,
+    alignItems: "center",
+    justifyContent: "center",
     flexDirection: "row",
-    justifyContent: "space-between",
-    paddingTop: 14,
-    paddingHorizontal: 14,
-    maxWidth: 600,
   },
-  leftNavBtns: {
-    flexDirection: "row",
-    gap: 8,
-    minWidth: 80,
+  loadingMoreText: {
+    marginLeft: 10,
   },
-  rightNavBtns: {
-    flexDirection: "row",
-    gap: 8,
-    minWidth: 80,
+  endOfResultsText: {
+    textAlign: "center",
+    padding: 20,
   },
   dataText: {
     color: "#f1f1f1",
