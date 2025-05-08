@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Text, View, StyleSheet, Alert, ActivityIndicator } from "react-native";
+import { View, StyleSheet, Alert, ActivityIndicator } from "react-native";
 import { Camera, CameraView } from "expo-camera";
-import { Colors } from "react-native-ui-lib";
+import { Colors, Text } from "react-native-ui-lib";
 import { api } from "@/utils/apiRequest";
 import CircleButton from "./CircleButton";
 import ErrorBoundary from "./ErrorBoundary";
@@ -174,10 +174,18 @@ function BarcodeScannerComponent({ onScanComplete }: BarcodeScannerProps) {
   };
 
   if (hasPermission === null) {
-    return <Text>Requesting camera permission</Text>;
+    return (
+      <Text color={Colors.text} style={styles.dataText}>
+        Requesting camera permission.
+      </Text>
+    );
   }
   if (hasPermission === false) {
-    return <Text>No access to camera</Text>;
+    return (
+      <Text color={"red"} style={styles.errorText}>
+        No access to camera.{"\n"}Check Android Camera permissions.
+      </Text>
+    );
   }
 
   return (
