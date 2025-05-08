@@ -51,6 +51,7 @@ function ScannedReleaseListItem({
           <Ionicons
             name="add-circle-outline"
             size={38}
+            color={Colors.primary}
             style={styles.plusIcon}
           />
         </Pressable>

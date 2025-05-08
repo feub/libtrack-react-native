@@ -1,6 +1,7 @@
 import React from "react";
 import { View, StyleSheet, Pressable } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { Colors } from "react-native-ui-lib";
 
 interface CircleButtonProps {
   setScanned: React.Dispatch<React.SetStateAction<boolean>>;
@@ -10,7 +11,11 @@ export default function CircleButton({ setScanned }: CircleButtonProps) {
   return (
     <View style={styles.circleButtonContainer}>
       <Pressable style={styles.circleButton} onPress={() => setScanned(false)}>
-        <MaterialIcons name="qr-code-scanner" size={38} color="#25292e" />
+        <MaterialIcons
+          name="qr-code-scanner"
+          size={38}
+          color={Colors.background}
+        />
       </Pressable>
     </View>
   );
@@ -30,6 +35,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 42,
-    backgroundColor: "#fff",
+    backgroundColor: Colors.primary,
   },
 });
