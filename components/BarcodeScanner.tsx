@@ -4,7 +4,6 @@ import { Camera, CameraView } from "expo-camera";
 import { Colors, Text } from "react-native-ui-lib";
 import { api } from "@/utils/apiRequest";
 import CircleButton from "./CircleButton";
-import ErrorBoundary from "./ErrorBoundary";
 import { useIsFocused } from "@react-navigation/native";
 
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
@@ -19,7 +18,10 @@ type BarcodeScannerProps = {
   onScanComplete: (data: any) => void;
 };
 
-function BarcodeScannerComponent({ onScanComplete }: BarcodeScannerProps) {
+// Wrap the component with ErrorBoundary
+export default function BarcodeScanner({
+  onScanComplete,
+}: BarcodeScannerProps) {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [scanned, setScanned] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
@@ -216,24 +218,6 @@ function BarcodeScannerComponent({ onScanComplete }: BarcodeScannerProps) {
         {scanned && <CircleButton setScanned={setScanned} />}
       </View>
     </>
-  );
-}
-
-// Wrap the component with ErrorBoundary
-export default function BarcodeScanner(props: BarcodeScannerProps) {
-  return (
-    <ErrorBoundary
-      fallback={
-        <View style={styles.container}>
-          <Text style={styles.errorText}>
-            Camera error occurred. Please try again.
-          </Text>
-          <CircleButton setScanned={() => {}} />
-        </View>
-      }
-    >
-      <BarcodeScannerComponent {...props} />
-    </ErrorBoundary>
   );
 }
 

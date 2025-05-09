@@ -7,7 +7,6 @@ import { ActivityIndicator, View } from "react-native";
 import { Typography, Colors } from "react-native-ui-lib";
 import { AuthProvider } from "@/context/AuthProvider";
 import { useAuth } from "@/hooks/useAuth";
-import ErrorBoundary from "@/components/ErrorBoundary";
 
 Colors.loadColors({
   primary: "#FB6413",
@@ -68,11 +67,9 @@ export default function RootLayout() {
   }
 
   return (
-    <ErrorBoundary>
-      <AuthProvider>
-        <RootLayoutNav />
-      </AuthProvider>
-    </ErrorBoundary>
+    <AuthProvider>
+      <RootLayoutNav />
+    </AuthProvider>
   );
 }
 
