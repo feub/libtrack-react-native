@@ -15,16 +15,22 @@ export type ScanReleaseType = {
     },
   ];
   year?: number;
-  formats: [
+  formats?: [
     {
       name: string;
     },
   ];
+  shelf: ShelfType;
 };
 
 export type ArtistType = {
   id: number;
   name: string;
+};
+
+export type ShelfType = {
+  id: number;
+  location: string;
 };
 
 export type CoverType = {
@@ -43,9 +49,6 @@ export type ListReleaseType = {
   cover?: string;
   barcode?: string;
   artists?: ArtistType[];
-  shelf: {
-    id: number;
-    location: string;
-  };
-  format: FormatType;
+  shelf?: ShelfType;
+  format?: FormatType;
 };

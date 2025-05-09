@@ -65,13 +65,18 @@ export default function Index() {
     fetchData();
   }, []);
 
-  const handleAddRelease = async (barcode: string, release_id: string) => {
+  const handleAddRelease = async (
+    barcode: string,
+    release_id: string,
+    shelf: number | null = null,
+  ) => {
     setLoading(true);
 
     try {
       const response = await api.post(`${apiUrl}/api/release/scan/add`, {
         barcode: barcode,
         release_id: release_id,
+        shelf: shelf,
       });
 
       if (!response.ok && response.status !== 409) {
