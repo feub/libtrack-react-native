@@ -7,9 +7,11 @@ import {
   ScrollView,
 } from "react-native";
 import { api } from "@/utils/apiRequest";
+import { handleApiError } from "@/utils/handleApiError";
 import { Colors, Text } from "react-native-ui-lib";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { ScanResponseType } from "@/types/releaseTypes";
+import ServerUnavailable from "@/components/ServerUnavailable";
 import BarcodeScanner from "@/components/BarcodeScanner";
 import MyText from "@/components/MyText";
 import CircleButton from "@/components/CircleButton";
@@ -23,6 +25,7 @@ export default function Index() {
   const [afteradded, setAfteradded] = useState<string | null>(null);
   const [afteraddedError, setAfteraddedError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [apiAvailable, setApiAvailable] = useState<boolean>(true);
 
   const handleScanComplete = (data: any) => {
     setScannedData(data);
@@ -30,39 +33,33 @@ export default function Index() {
 
   const handleScanAgain = () => {
     setScannedData(null);
+    setAfteraddedError(null);
+    setAfteradded(null);
   };
 
   useEffect(() => {
-    const fetchData = async () => {
+    const checkApiHealth = async () => {
       try {
         const response = await api.get(`${apiUrl}/api/health`);
 
         if (!response.ok) {
+          setApiAvailable(false);
           Alert.alert(
             "API Error",
             `Server not reachable. Please try again later.\n${apiUrl}/api/health`,
             [{ text: "OK" }],
           );
         } else {
+          setApiAvailable(true);
           console.log("🚀 Healthy API");
         }
       } catch (error: any) {
-        console.error("API Error:", error);
-        console.error("Error message:", error.message);
-        if (error.response) {
-          console.error("Error response data:", error.response.data);
-          console.error("Error response status:", error.response.status);
-        }
-
-        Alert.alert(
-          "API Error",
-          `Server not reachable. Please try again later.\n${apiUrl}/api/health`,
-          [{ text: "OK" }],
-        );
+        setApiAvailable(false);
+        handleApiError(error, "Health check", `${apiUrl}/api/health`);
       }
     };
 
-    fetchData();
+    checkApiHealth();
   }, []);
 
   const handleAddRelease = async (
@@ -71,6 +68,8 @@ export default function Index() {
     shelf: number | null = null,
   ) => {
     setLoading(true);
+    setAfteraddedError(null);
+    setAfteradded(null);
 
     try {
       const response = await api.post(`${apiUrl}/api/release/scan/add`, {
@@ -79,12 +78,9 @@ export default function Index() {
         shelf: shelf,
       });
 
+      // Handle non-200 responses that aren't 409 (conflict)
       if (!response.ok && response.status !== 409) {
-        Alert.alert(
-          "API Error",
-          `Server not reachable. Please try again later.\n${apiUrl}/api/release/scan/add`,
-          [{ text: "OK" }],
-        );
+        throw new Error(`Server returned ${response.status}`);
       }
 
       const responseData = await response.json();
@@ -99,18 +95,13 @@ export default function Index() {
           setAfteraddedError("🧐 " + responseData.message);
         }
       } else {
-        setAfteraddedError("🧐 " + responseData.message);
+        setAfteraddedError(
+          "🧐 " + responseData.message || "Unknown error occurred",
+        );
       }
     } catch (error: any) {
-      console.error("API Error:", error);
-      console.error("Error message:", error.message);
-
+      handleApiError(error, "Add release", `${apiUrl}/api/release/scan/add`);
       setAfteraddedError("🧐 Error connecting to the server");
-
-      if (error.response) {
-        console.error("Error response data:", error.response.data);
-        console.error("Error response status:", error.response.status);
-      }
     } finally {
       setLoading(false);
     }
@@ -118,8 +109,13 @@ export default function Index() {
 
   return (
     <View style={styles.container}>
+      {!apiAvailable && (
+        <ServerUnavailable message="Server connection unavailable. Some features may be limited." />
+      )}
+
       {afteradded && <MyToast message={afteradded} type="success" />}
       {afteraddedError && <MyToast message={afteraddedError} type="danger" />}
+
       {scannedData ? (
         <>
           <View style={styles.resultsContainer}>

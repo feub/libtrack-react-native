@@ -9,11 +9,14 @@ import {
 } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { api } from "@/utils/apiRequest";
+import { handleApiError } from "@/utils/handleApiError";
 import { Colors, Text } from "react-native-ui-lib";
+import ServerUnavailable from "@/components/ServerUnavailable";
 import { ListReleaseType } from "@/types/releaseTypes";
 import ReleaseListItem from "@/components/ReleaseListItem";
 import SearchTerm from "@/components/SearchTerm";
 import { useNavigation } from "expo-router";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
@@ -26,6 +29,7 @@ export default function Releases() {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [hasMoreData, setHasMoreData] = useState<boolean>(true);
+  const [apiAvailable, setApiAvailable] = useState<boolean>(true);
 
   const navigation = useNavigation();
 
@@ -44,22 +48,27 @@ export default function Releases() {
         limit: "10",
       });
 
-      const response = await api.get(
-        `${apiUrl}/api/release?${params.toString()}`,
-      );
+      const endpoint = `${apiUrl}/api/release?${params.toString()}`;
+      const response = await api.get(endpoint);
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error(
-          "Error listing releases:",
-          errorData.message || "Unknown error",
+        handleApiError(
+          {
+            message: errorData.message || "Failed to list releases",
+            response: {
+              data: errorData,
+              status: response.status,
+            },
+          },
+          "Release list",
+          endpoint,
         );
-        Alert.alert("☠️", errorData.message || "Failed to list releases", [
-          { text: "OK" },
-        ]);
-        setLoading(false);
+        setApiAvailable(false);
         return;
       }
+
+      setApiAvailable(true);
 
       const responseData = await response.json();
 
@@ -75,20 +84,17 @@ export default function Releases() {
         setMaxPage(responseData.data.maxPage);
         setTotalReleases(responseData.data.totalReleases);
         setHasMoreData(page < responseData.data.maxPage);
+      } else if (responseData.type === "error") {
+        handleApiError(
+          {
+            message: responseData.message || "Unknown error",
+          },
+          endpoint,
+        );
       }
     } catch (error: any) {
-      console.error("API Error:", error);
-      console.error("Error message:", error.message);
-      if (error.response) {
-        console.error("Error response data:", error.response.data);
-        console.error("Error response status:", error.response.status);
-      }
-
-      Alert.alert(
-        "API Error",
-        "Server not reachable. Please try again later.\n" + error,
-        [{ text: "OK" }],
-      );
+      setApiAvailable(false);
+      handleApiError(error, "Release list", `${apiUrl}/api/release`);
     } finally {
       setRefreshing(false);
       setLoading(false);
@@ -138,6 +144,10 @@ export default function Releases() {
   return (
     <GestureHandlerRootView>
       <View style={styles.container}>
+        {!apiAvailable && (
+          <ServerUnavailable message="Server connection issue. Pull down to retry." />
+        )}
+
         <SearchTerm onSubmit={handleSearchSubmit} />
         <ScrollView
           style={styles.entriesContainer}
@@ -160,10 +170,21 @@ export default function Releases() {
           }}
           scrollEventThrottle={400}
         >
-          {releases &&
+          {releases.length === 0 && !loading ? (
+            <View style={styles.emptyStateContainer}>
+              <Text color={Colors.text}>
+                {apiAvailable
+                  ? `No releases found${
+                      searchTerm ? " matching your search" : ""
+                    }`
+                  : "Unable to fetch releases. Pull down to retry."}
+              </Text>
+            </View>
+          ) : (
             releases.map((release, index) => (
               <ReleaseListItem key={index} release={release} />
-            ))}
+            ))
+          )}
 
           {loading && (
             <View style={styles.loadingMoreContainer}>
@@ -198,6 +219,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 10,
     paddingBottom: 25,
+  },
+  emptyStateContainer: {
+    padding: 30,
+    alignItems: "center",
+    justifyContent: "center",
   },
   entriesContainer: {
     width: "100%",
