@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState, useLayoutEffect } from "react";
 import {
   View,
   StyleSheet,
-  Alert,
   RefreshControl,
   ScrollView,
   ActivityIndicator,
@@ -16,7 +15,7 @@ import { ListReleaseType } from "@/types/releaseTypes";
 import ReleaseListItem from "@/components/ReleaseListItem";
 import SearchTerm from "@/components/SearchTerm";
 import { useNavigation } from "expo-router";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import ShelvesFilter from "@/components/ShelvesFilter";
 
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
@@ -27,15 +26,18 @@ export default function Releases() {
   const [totalReleases, setTotalReleases] = useState<number>(0);
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [searchShelf, setSearchShelf] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [hasMoreData, setHasMoreData] = useState<boolean>(true);
   const [apiAvailable, setApiAvailable] = useState<boolean>(true);
+  const [selectedShelfId, setSelectedShelfId] = useState<string | "">("");
 
   const navigation = useNavigation();
 
   const fetchData = async (
     page: number,
     searchTerm: string = "",
+    searchShelf: string = "",
     isLoadMore: boolean = false,
   ) => {
     if (!hasMoreData && isLoadMore) return;
@@ -45,6 +47,7 @@ export default function Releases() {
       const params = new URLSearchParams({
         page: page.toString(),
         search: searchTerm.toString(),
+        shelf: selectedShelfId,
         limit: "10",
       });
 
@@ -105,7 +108,7 @@ export default function Releases() {
     if (!loading && hasMoreData) {
       const nextPage = currentPage + 1;
       setCurrentPage(nextPage);
-      fetchData(nextPage, searchTerm, true);
+      fetchData(nextPage, searchTerm, selectedShelfId, true);
     }
   };
 
@@ -113,9 +116,9 @@ export default function Releases() {
     // Only fetch when currentPage is 1 (initial load or search)
     // Other pages are loaded via loadMoreData
     if (currentPage === 1) {
-      fetchData(1, searchTerm, false);
+      fetchData(1, searchTerm, selectedShelfId, false);
     }
-  }, [searchTerm]);
+  }, [searchTerm, selectedShelfId]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -130,7 +133,7 @@ export default function Releases() {
 
     setTimeout(() => {
       // setRefreshing(false);
-      fetchData(1, searchTerm, false);
+      fetchData(1, searchTerm, selectedShelfId, false);
     }, 1000);
   }, [searchTerm]);
 
@@ -141,6 +144,11 @@ export default function Releases() {
     return Promise.resolve();
   };
 
+  const handleShelfSelect = (shelfId: string) => {
+    setSelectedShelfId(shelfId);
+  };
+  console.log("shelf:", selectedShelfId);
+
   return (
     <GestureHandlerRootView>
       <View style={styles.container}>
@@ -149,6 +157,10 @@ export default function Releases() {
         )}
 
         <SearchTerm onSubmit={handleSearchSubmit} />
+        <ShelvesFilter
+          selectedShelf={selectedShelfId}
+          onSelectShelf={handleShelfSelect}
+        />
         <ScrollView
           style={styles.entriesContainer}
           refreshControl={
