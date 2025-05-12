@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Stack, useRouter, useSegments } from "expo-router";
+import { Stack } from "expo-router";
 import { StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
+import { useProtectedRoute } from "@/hooks/useProtectedRoute";
 import { ActivityIndicator, View } from "react-native";
 import { Typography, Colors } from "react-native-ui-lib";
 import { AuthProvider } from "@/context/AuthProvider";
-import { useAuth } from "@/hooks/useAuth";
 
 Colors.loadColors({
   primary: "#FB6413",
@@ -27,23 +27,6 @@ Typography.loadTypographies({
   h3: { fontSize: 34, fontWeight: "300", lineHeight: 48 },
   body: { fontSize: 16 },
 });
-
-// A custom hook for authentication and routing logic
-function useProtectedRoute() {
-  const { token } = useAuth();
-  const segments = useSegments();
-  const router = useRouter();
-
-  useEffect(() => {
-    const inAuthGroup = segments[0] === "(tabs)";
-
-    if (!token && inAuthGroup) {
-      router.replace("/login");
-    } else if (token && segments[0] === "login") {
-      router.replace("/(tabs)");
-    }
-  }, [token, segments, router]);
-}
 
 export default function RootLayout() {
   const [isReady, setIsReady] = useState(false);

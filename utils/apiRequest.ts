@@ -87,26 +87,31 @@ export async function apiRequest(url: string, options: RequestInit = {}) {
   }
 
   try {
-    // Log request details for debugging
-    // if (requestOptions.body) {
-    //   try {
-    //     const bodyContent = JSON.parse(requestOptions.body.toString());
-    //     console.log(
-    //       "apiRequest.ts ~ request body structure:",
-    //       Object.keys(bodyContent).join(", "),
-    //     );
-    //   } catch (e) {
-    //     console.log(
-    //       "apiRequest.ts ~ request body:",
-    //       requestOptions.body.toString().substring(0, 100) + "...",
-    //     );
-    //   }
-    // }
-
     let response = await fetch(url, {
       ...options,
       headers,
     });
+
+    // Check if we need to handle a potential HTML response
+    const contentType = response.headers.get("content-type") || "";
+    if (contentType.includes("text/html")) {
+      console.error("HTML response detected when JSON expected");
+      // Clear tokens and redirect to login
+      await SecureStore.deleteItemAsync("access_token");
+      await SecureStore.deleteItemAsync("refresh_token");
+      await SecureStore.deleteItemAsync("user");
+
+      setTimeout(() => {
+        Alert.alert(
+          "Authentication Expired",
+          "Your session has expired. Please log in again.",
+          [{ text: "OK" }],
+        );
+        router.replace("/login");
+      }, 100);
+
+      throw new Error("Authentication failed - please login again");
+    }
 
     // Handle 401 unauthorized by attempting to refresh token first
     if (response.status === 401) {
