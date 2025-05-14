@@ -45,7 +45,7 @@ export default function SearchTerm({ onSubmit }: SearchFormProps) {
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         {errors.searchTerm && (
-          <Text style={styles.errorText}>
+          <Text style={[styles.errorText, { color: Colors.red30 }]}>
             {errors.searchTerm.message as String}
           </Text>
         )}
@@ -95,14 +95,12 @@ export default function SearchTerm({ onSubmit }: SearchFormProps) {
 
 const styles = StyleSheet.create({
   safeArea: {
-    backgroundColor: Colors.background,
     width: "100%",
   },
   container: {
     paddingHorizontal: 14,
     paddingBottom: 10,
     width: "100%",
-    backgroundColor: Colors.background,
   },
   inputContainer: {
     flexDirection: "row",
@@ -117,14 +115,13 @@ const styles = StyleSheet.create({
   input: {
     width: "100%",
     height: 40,
-    color: Colors.text,
+    color: "#ffffff",
   },
   fieldStyle: {
-    backgroundColor: Colors.background,
     borderColor: "#6E7881",
     borderWidth: 1,
     borderRadius: 8,
-    paddingHorizontal: Spacings.s2,
+    paddingHorizontal: 8,
     paddingRight: 30,
     height: 40,
   },
@@ -140,7 +137,6 @@ const styles = StyleSheet.create({
     zIndex: 100,
   },
   errorText: {
-    color: Colors.red30 || "red",
     marginBottom: 10,
   },
 });

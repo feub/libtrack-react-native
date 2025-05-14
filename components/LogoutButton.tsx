@@ -15,7 +15,10 @@ const LogoutButton = () => {
   };
 
   return (
-    <Button style={styles.buttonContainer} onPress={handleLogout}>
+    <Button
+      style={[styles.buttonContainer, { backgroundColor: Colors.primary }]}
+      onPress={handleLogout}
+    >
       <MaterialIcons name="logout" size={24} color={Colors.background} />
       <Text style={styles.logoutBtn}>Logout</Text>
     </Button>
@@ -29,7 +32,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f97316",
     borderRadius: 12,
     padding: 10,
   },

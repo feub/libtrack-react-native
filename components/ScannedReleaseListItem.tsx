@@ -4,7 +4,6 @@ import {
   StyleSheet,
   Image,
   Pressable,
-  TextInput,
   ScrollView,
   Alert,
 } from "react-native";
@@ -171,10 +170,14 @@ function ScannedReleaseListItem({
               style={styles.modalScroll}
               showsVerticalScrollIndicator={false}
             >
-              <Text style={styles.modalTitle}>Confirm Release Details</Text>
+              <Text style={[styles.modalTitle, { color: Colors.white }]}>
+                Confirm Release Details
+              </Text>
 
               <View style={styles.formField}>
-                <Text style={styles.label}>Select shelf</Text>
+                <Text style={[styles.label, { color: Colors.grey40 }]}>
+                  Select shelf
+                </Text>
                 <View style={styles.shelfContainer}>
                   {shelves &&
                     shelves.map((shelf: ShelfType) => (
@@ -182,16 +185,18 @@ function ScannedReleaseListItem({
                         key={shelf.id}
                         style={[
                           styles.shelfItem,
-                          selectedShelf === shelf.id &&
-                            styles.shelfItemSelected,
+                          selectedShelf === shelf.id && {
+                            borderColor: Colors.primary,
+                          },
                         ]}
                         onPress={() => handleShelfSelect(shelf.id)}
                       >
                         <Text
                           style={[
-                            styles.shelfText,
-                            selectedShelf === shelf.id &&
-                              styles.shelfTextSelected,
+                            { color: Colors.white },
+                            selectedShelf === shelf.id && {
+                              borderColor: Colors.primary,
+                            },
                           ]}
                         >
                           {shelf.location}
@@ -290,7 +295,6 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontWeight: "bold",
-    color: Colors.white,
     marginBottom: 20,
     textAlign: "center",
   },
@@ -298,14 +302,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   label: {
-    color: Colors.grey40,
     marginBottom: 6,
-  },
-  input: {
-    backgroundColor: "#20303C",
-    padding: 10,
-    borderRadius: 6,
-    color: Colors.white,
   },
   shelfContainer: {
     flexDirection: "row",
@@ -321,23 +318,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "transparent",
   },
-  shelfItemSelected: {
-    borderColor: Colors.primary,
-  },
-  shelfText: {
-    color: Colors.white,
-  },
-  shelfTextSelected: {
-    color: Colors.primary,
-    fontWeight: "bold",
-  },
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginTop: 20,
   },
   button: {
-    flex: 1,
     marginHorizontal: 5,
   },
 });

@@ -102,7 +102,7 @@ export default function BarcodeScanner({
           />
         )}
         <View style={styles.overlay}>
-          <Text style={styles.scanText}>
+          <Text style={[styles.scanText, { color: Colors.text }]}>
             Position barcode within frame to scan
           </Text>
         </View>
@@ -134,24 +134,13 @@ const styles = StyleSheet.create({
   },
   scanText: {
     fontSize: 16,
-    color: Colors.text,
     opacity: 0.4,
     textAlign: "center",
-  },
-  dataText: {
-    color: Colors.text,
-    padding: 10,
   },
   loaderContainer: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: "rgba(0, 0, 0, 0.6)",
     justifyContent: "center",
     alignItems: "center",
-  },
-  errorText: {
-    color: Colors.error,
-    fontSize: 16,
-    textAlign: "center",
-    marginBottom: 20,
   },
 });

@@ -68,7 +68,12 @@ export default function RootLayout() {
   // Show API unavailable message when API is not healthy
   if (!apiHealthy) {
     return (
-      <View style={styles.loadingContainer}>
+      <View
+        style={[
+          styles.loadingContainer,
+          { backgroundColor: Colors.background },
+        ]}
+      >
         <View style={styles.errorContainer}>
           <Text color={Colors.error}>Unable to connect to server</Text>
           <Text text80 color={Colors.textDown} style={styles.errorText}>
@@ -101,7 +106,9 @@ function RootLayoutNav() {
   useProtectedRoute();
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView
+      style={[styles.safeArea, { backgroundColor: Colors.background }]}
+    >
       <Stack
         screenOptions={{
           headerStyle: {
@@ -140,13 +147,11 @@ function RootLayoutNav() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: Colors.background,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: Colors.background,
   },
   errorContainer: {
     padding: 20,

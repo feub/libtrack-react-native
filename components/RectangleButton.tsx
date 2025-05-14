@@ -12,7 +12,10 @@ export default function RectangleButton({
 }: RectangleButtonProps) {
   return (
     <View style={styles.buttonContainer}>
-      <Pressable style={styles.circleButton} onPress={handleOnPress}>
+      <Pressable
+        style={[styles.btn, { borderColor: Colors.primary }]}
+        onPress={handleOnPress}
+      >
         {children}
       </Pressable>
     </View>
@@ -24,13 +27,11 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
   },
-  circleButton: {
+  btn: {
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 12,
     padding: Spacings.s1,
-    // backgroundColor: Colors.primary,
-    borderColor: Colors.primary,
     borderWidth: 1,
   },
 });
