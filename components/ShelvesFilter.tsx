@@ -63,25 +63,15 @@ export default function ShelvesFilter({
 
   // Handle shelf selection/unselection
   const handleShelfPress = (shelfId: string) => {
-    console.log(
-      "Unselecting shelf: shelfId = ",
-      typeof shelfId,
-      "selectedShelf = ",
-      typeof selectedShelf,
-    );
     if (selectedShelf === shelfId) {
       onSelectShelf("");
     } else {
-      console.log("Selecting shelf", shelfId);
-
       onSelectShelf(shelfId.toString());
     }
   };
 
   // Helper function to check if a shelf is selected
   const isShelfSelected = (shelfId: string): boolean => {
-    console.log("equlq?", selectedShelf === shelfId);
-
     return selectedShelf === shelfId;
   };
 

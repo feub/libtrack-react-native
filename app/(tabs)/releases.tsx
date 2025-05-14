@@ -147,7 +147,6 @@ export default function Releases() {
   const handleShelfSelect = (shelfId: string) => {
     setSelectedShelfId(shelfId);
   };
-  console.log("shelf:", selectedShelfId);
 
   return (
     <GestureHandlerRootView>
