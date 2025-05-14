@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import { View, Alert, StyleSheet } from "react-native";
 import { Image } from "react-native";
-import icon from "@/assets/images/splash-icon.png";
 import { useRouter } from "expo-router";
+import * as SecureStore from "expo-secure-store";
+import { isTokenExpired } from "@/utils/decodeJwt";
+import icon from "@/assets/images/splash-icon.png";
 import { useAuth } from "@/hooks/useAuth";
 import { Button, Text, TextField, Colors, Spacings } from "react-native-ui-lib";
-
-const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
 const Login = () => {
   const [email, setEmail] = useState<string>("fabien@feub.net");
@@ -16,14 +16,19 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState<boolean>(true);
   const emailInputRef = useRef<any>(null);
   const router = useRouter();
-  const { loginUser, user } = useAuth();
+  const { loginUser, user, token } = useAuth();
 
-  // Redirect to tabs if already authenticated
+  // Redirect to tabs if already authenticated and token valid
   useEffect(() => {
-    if (user) {
-      router.replace("/(tabs)");
-    }
-  }, [user, router]);
+    const checkAuth = async () => {
+      const accessToken =
+        token || (await SecureStore.getItemAsync("access_token"));
+      if (user && accessToken && !isTokenExpired(accessToken)) {
+        router.replace("/(tabs)");
+      }
+    };
+    checkAuth();
+  }, [user, router, token]);
 
   useEffect(() => {
     if (emailInputRef.current) {

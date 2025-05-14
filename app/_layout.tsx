@@ -3,6 +3,8 @@ import { Stack } from "expo-router";
 import { StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
+import * as SecureStore from "expo-secure-store";
+import { isTokenExpired } from "@/utils/decodeJwt";
 import { useProtectedRoute } from "@/hooks/useProtectedRoute";
 import { ActivityIndicator, View } from "react-native";
 import { Typography, Colors, Text, Button } from "react-native-ui-lib";
@@ -30,30 +32,68 @@ Typography.loadTypographies({
 
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
+async function tryRefreshToken() {
+  const refreshToken = await SecureStore.getItemAsync("refresh_token");
+  if (!refreshToken) return false;
+  try {
+    const response = await fetch(`${apiUrl}/api/token/refresh`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ refresh_token: refreshToken }),
+    });
+    if (!response.ok) return false;
+    const data = await response.json();
+    if (data.token && data.refresh_token) {
+      await SecureStore.setItemAsync("access_token", data.token);
+      await SecureStore.setItemAsync("refresh_token", data.refresh_token);
+      return true;
+    }
+    return false;
+  } catch {
+    return false;
+  }
+}
+
 export default function RootLayout() {
   const [isReady, setIsReady] = useState<boolean>(false);
   const [apiHealthy, setApiHealthy] = useState<boolean>(true);
 
-  // Set a small delay to ensure auth state is fully initialized
+  // Check token expiry and refresh if needed before marking ready
   useEffect(() => {
-    const checkApiHealth = async () => {
+    let cancelled = false;
+
+    const checkAuthAndApi = async () => {
+      // 1. Check API health
       try {
         const response = await fetch(`${apiUrl}/api/health`);
-        setApiHealthy(response.ok);
+        if (!cancelled) setApiHealthy(response.ok);
       } catch (error) {
-        console.error("API health check failed:", error);
-        setApiHealthy(false);
+        console.error("_layout.tsx ~ API health check failed:", error);
+        if (!cancelled) setApiHealthy(false);
       }
-      setIsReady(true);
+
+      // 2. Check access token expiry and refresh if needed
+      const accessToken = await SecureStore.getItemAsync("access_token");
+      let tokenExpiration = true;
+
+      if (accessToken) {
+        tokenExpiration = isTokenExpired(accessToken);
+        console.log("_layout.tsx ~ Token expiration status:", tokenExpiration);
+      }
+
+      if (accessToken && tokenExpiration) {
+        console.log("_layout.tsx ~ Access token expired, trying to refresh...");
+        await tryRefreshToken();
+      }
+
+      if (!cancelled) setIsReady(true);
     };
 
-    checkApiHealth();
+    checkAuthAndApi();
 
-    const timer = setTimeout(() => {
-      setIsReady(true);
-    }, 1000);
-
-    return () => clearTimeout(timer);
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // Show loading indicator while waiting for auth state
