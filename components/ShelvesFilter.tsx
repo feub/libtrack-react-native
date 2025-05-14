@@ -11,7 +11,7 @@ export default function ShelvesFilter({
   selectedShelf,
   onSelectShelf,
 }: {
-  selectedShelf: string | number | "";
+  selectedShelf: string | "";
   onSelectShelf: (shelfId: string | "") => void;
 }) {
   const [shelves, setShelves] = useState<ShelfType[]>([]);
@@ -62,35 +62,56 @@ export default function ShelvesFilter({
   };
 
   // Handle shelf selection/unselection
-  const handleShelfPress = (shelfId: number | string) => {
+  const handleShelfPress = (shelfId: string) => {
+    console.log(
+      "Unselecting shelf: shelfId = ",
+      typeof shelfId,
+      "selectedShelf = ",
+      typeof selectedShelf,
+    );
     if (selectedShelf === shelfId) {
       onSelectShelf("");
     } else {
+      console.log("Selecting shelf", shelfId);
+
       onSelectShelf(shelfId.toString());
     }
   };
 
   // Helper function to check if a shelf is selected
-  const isShelfSelected = (shelfId: number | string): boolean => {
-    return selectedShelf.toString() === shelfId.toString();
+  const isShelfSelected = (shelfId: string): boolean => {
+    console.log("equlq?", selectedShelf === shelfId);
+
+    return selectedShelf === shelfId;
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView
+      style={[styles.safeArea, { backgroundColor: Colors.background }]}
+    >
       <View style={styles.container}>
         {!loading &&
           shelves &&
           shelves.map((shelf) => (
             <TouchableOpacity
               key={shelf.id}
-              onPress={() => handleShelfPress(shelf.id)}
+              onPress={() => handleShelfPress(shelf.id.toString())}
             >
               <Text
                 style={[
                   styles.btn,
-                  isShelfSelected(shelf.id) && styles.selectedBtn,
+                  { borderColor: Colors.primary },
+                  isShelfSelected(shelf.id.toString()) && {
+                    backgroundColor: Colors.primary,
+                    borderColor: Colors.primary,
+                    borderWidth: 1,
+                  },
                 ]}
-                color={isShelfSelected(shelf.id) ? Colors.white : Colors.text}
+                color={
+                  isShelfSelected(shelf.id.toString())
+                    ? Colors.white
+                    : Colors.text
+                }
               >
                 {shelf.location}
               </Text>
@@ -103,7 +124,6 @@ export default function ShelvesFilter({
 
 const styles = StyleSheet.create({
   safeArea: {
-    backgroundColor: Colors.background,
     width: "100%",
   },
   container: {
@@ -116,16 +136,10 @@ const styles = StyleSheet.create({
   },
   btn: {
     fontSize: 10,
-    borderColor: Colors.primary,
     borderWidth: 1,
     borderRadius: 4,
     paddingHorizontal: 6,
     paddingVertical: 4,
     margin: 5,
-  },
-  selectedBtn: {
-    backgroundColor: Colors.primary,
-    borderWidth: 1,
-    borderColor: Colors.primary,
   },
 });
