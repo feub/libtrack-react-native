@@ -13,16 +13,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const loadStoredAuth = async () => {
       try {
-        const currentToken =
-          (await SecureStore.getItemAsync("access_token")) || null;
-        const currentRefreshToken =
-          (await SecureStore.getItemAsync("refresh_token")) || null;
-        const currentUser = (await SecureStore.getItemAsync("user"))
-          ? JSON.parse((await SecureStore.getItemAsync("user")) || "")
-          : null;
+        const currentToken = await SecureStore.getItemAsync("access_token");
+        const currentRefreshToken = await SecureStore.getItemAsync(
+          "refresh_token",
+        );
+        const userString = await SecureStore.getItemAsync("user");
+        const currentUser = userString ? JSON.parse(userString) : null;
 
-        setToken(currentToken);
-        setRefreshToken(currentRefreshToken);
+        setToken(currentToken || null);
+        setRefreshToken(currentRefreshToken || null);
         setUser(currentUser);
       } catch (error) {
         console.error("Error loading authentication data:", error);
