@@ -18,9 +18,7 @@ export default function TabLayout() {
           backgroundColor: Colors.background,
           borderTopColor: Colors.background,
         },
-        headerTitleStyle: {
-          fontFamily: "Quicksand_700Bold",
-        },
+        headerTitleStyle: {},
         headerTitleContainerStyle: {
           width: 200,
         },

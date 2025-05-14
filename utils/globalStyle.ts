@@ -1,10 +1,8 @@
 import { StyleSheet } from "react-native";
 
 export const globalStyles = StyleSheet.create({
-  defaultText: {
-    fontFamily: "VarelaRound_400Regular",
-  },
+  defaultText: {},
   boldText: {
-    fontFamily: "VarelaRound_700Bold",
+    fontWeight: "bold",
   },
 });

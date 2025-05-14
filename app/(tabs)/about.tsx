@@ -51,7 +51,6 @@ const styles = StyleSheet.create({
   title: {
     color: "#ffffff",
     marginVertical: 10,
-    fontFamily: "Quicksand_700Bold",
     fontSize: 24,
   },
   paragraph: {

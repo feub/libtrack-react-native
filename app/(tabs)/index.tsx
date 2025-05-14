@@ -161,7 +161,6 @@ export default function Index() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    fontFamily: "VarelaRound_400Regular",
     backgroundColor: "#18181b",
     color: "#f1f1f1",
   },
