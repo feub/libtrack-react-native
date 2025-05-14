@@ -5,7 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { useProtectedRoute } from "@/hooks/useProtectedRoute";
 import { ActivityIndicator, View } from "react-native";
-import { Typography, Colors } from "react-native-ui-lib";
+import { Typography, Colors, Text, Button } from "react-native-ui-lib";
 import { AuthProvider } from "@/context/AuthProvider";
 
 Colors.loadColors({
@@ -28,11 +28,27 @@ Typography.loadTypographies({
   body: { fontSize: 16 },
 });
 
+const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+
 export default function RootLayout() {
-  const [isReady, setIsReady] = useState(false);
+  const [isReady, setIsReady] = useState<boolean>(false);
+  const [apiHealthy, setApiHealthy] = useState<boolean>(true);
 
   // Set a small delay to ensure auth state is fully initialized
   useEffect(() => {
+    const checkApiHealth = async () => {
+      try {
+        const response = await fetch(`${apiUrl}/api/health`);
+        setApiHealthy(response.ok);
+      } catch (error) {
+        console.error("API health check failed:", error);
+        setApiHealthy(false);
+      }
+      setIsReady(true);
+    };
+
+    checkApiHealth();
+
     const timer = setTimeout(() => {
       setIsReady(true);
     }, 1000);
@@ -45,6 +61,30 @@ export default function RootLayout() {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={Colors.primary} />
+      </View>
+    );
+  }
+
+  // Show API unavailable message when API is not healthy
+  if (!apiHealthy) {
+    return (
+      <View style={styles.loadingContainer}>
+        <View style={styles.errorContainer}>
+          <Text color={Colors.error}>Unable to connect to server</Text>
+          <Text text80 color={Colors.textDown} style={styles.errorText}>
+            Please check your internet connection and try again later.
+          </Text>
+          <Button
+            label="Retry"
+            backgroundColor={Colors.primary}
+            style={styles.retryButton}
+            onPress={() => {
+              setIsReady(false);
+              // This will trigger the useEffect to run again
+              setTimeout(() => {}, 100);
+            }}
+          />
+        </View>
       </View>
     );
   }
@@ -107,5 +147,18 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: Colors.background,
+  },
+  errorContainer: {
+    padding: 20,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  errorText: {
+    marginTop: 10,
+    textAlign: "center",
+  },
+  retryButton: {
+    marginTop: 20,
+    width: 120,
   },
 });
