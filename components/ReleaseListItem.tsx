@@ -1,8 +1,7 @@
 import React from "react";
 import { Image, View, StyleSheet } from "react-native";
-import { Text, Colors } from "react-native-ui-lib";
 import { ListReleaseType } from "@/types/releaseTypes";
-import MyText from "@/components/MyText";
+import { Text } from "@/components/ui/text";
 
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 const coverPath = process.env.EXPO_PUBLIC_COVER_PATH;
@@ -11,28 +10,32 @@ function ReleaseListItem({ release }: { release: ListReleaseType }) {
   return (
     <View key={release.id.toString()} style={styles.resultItemContainer}>
       <View style={styles.itemLeft}>
+        <Text className="text-tertiary-500 font-bold text-2xl">
+          {release.title}
+        </Text>
         {release.artists && release.artists.length > 0 && (
-          <>
-            <MyText style={styles.dataTextArtist}>
-              {release.artists?.map((artist) => artist.name).join(", ")}
-            </MyText>
-          </>
+          <Text className="font-bold">
+            <Text className="text-secondary-700 font-regular">Artist(s):</Text>{" "}
+            {release.artists?.map((artist) => artist.name).join(", ")}
+          </Text>
         )}
-        <MyText style={styles.dataTextTitle}>{release.title}</MyText>
         {release.release_date && (
-          <MyText style={styles.dataText}>
-            <Text color={Colors.textDown}>Date:</Text> {release.release_date}
-          </MyText>
+          <Text>
+            <Text className="text-secondary-700">Date:</Text>{" "}
+            {release.release_date}
+          </Text>
         )}
         {release.format && (
-          <MyText style={styles.dataText}>
-            <Text color={Colors.textDown}>Format:</Text> {release.format.name}
-          </MyText>
+          <Text>
+            <Text className="text-secondary-700">Format:</Text>{" "}
+            {release.format.name}
+          </Text>
         )}
         {release.shelf && (
-          <MyText style={styles.dataText}>
-            <Text color={Colors.textDown}>Shelf:</Text> {release.shelf.location}
-          </MyText>
+          <Text>
+            <Text className="text-secondary-700">Shelf:</Text>{" "}
+            {release.shelf.location}
+          </Text>
         )}
       </View>
       {release.cover ? (
@@ -49,7 +52,7 @@ function ReleaseListItem({ release }: { release: ListReleaseType }) {
         />
       ) : (
         <View style={styles.mockImageContainer}>
-          <MyText style={styles.mockImageText}>No cover</MyText>
+          <Text style={styles.mockImageText}>No cover</Text>
         </View>
       )}
     </View>
@@ -87,19 +90,5 @@ const styles = StyleSheet.create({
   },
   mockImageText: {
     color: "#71717a",
-  },
-  dataTextArtist: {
-    color: "#f1f1f1",
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  dataTextTitle: {
-    color: "#f1f1f1",
-    fontSize: 14,
-    fontWeight: "bold",
-  },
-  dataText: {
-    color: "#f1f1f1",
-    fontSize: 12,
   },
 });
