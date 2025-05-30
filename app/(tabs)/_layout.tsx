@@ -1,16 +1,10 @@
 import { Redirect, Tabs } from "expo-router";
-import { Colors } from "react-native-ui-lib";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function TabLayout() {
-  const { loading, isLoggedIn, token, user } = useAuth();
-
-  console.log("loading", loading);
-  console.log("isLoggedIn", isLoggedIn);
-  console.log("token", token);
-  console.log("user", user);
+  const { loading, isLoggedIn } = useAuth();
 
   if (loading) {
     return null; // or a loading spinner
@@ -20,20 +14,19 @@ export default function TabLayout() {
     return <Redirect href="/login" />;
   }
 
-  // const { user } = useAuth();
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors.primary,
-        tabBarInactiveTintColor: Colors.primaryInactive,
+        tabBarActiveTintColor: "#e78128",
+        tabBarInactiveTintColor: "#9d9d9d",
         headerStyle: {
-          backgroundColor: Colors.background,
+          backgroundColor: "#111113",
         },
         headerShadowVisible: true,
-        headerTintColor: Colors.primary,
+        headerTintColor: "#fb9d4b",
         tabBarStyle: {
-          backgroundColor: Colors.background,
-          borderTopColor: Colors.background,
+          backgroundColor: "#111113",
+          borderTopColor: "#111113",
         },
         headerTitleStyle: {},
         headerTitleContainerStyle: {
@@ -59,7 +52,11 @@ export default function TabLayout() {
         options={{
           title: "Scanner",
           tabBarIcon: ({ color, focused }) => (
-            <MaterialIcons name="qr-code-scanner" size={24} color={color} />
+            <MaterialIcons
+              name={focused ? "qr-code-scanner" : "qr-code-scanner"}
+              size={24}
+              color={color}
+            />
           ),
         }}
       />

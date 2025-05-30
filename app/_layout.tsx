@@ -9,7 +9,7 @@ import { AuthProvider } from "@/context/AuthProvider";
 
 export default function RootLayout() {
   return (
-    <GluestackUIProvider mode="light">
+    <GluestackUIProvider mode="dark">
       <AuthProvider>
         <SafeAreaView style={[styles.safeArea, { backgroundColor: "#111113" }]}>
           <StatusBar style="light" />
