@@ -4,7 +4,16 @@ import { Image } from "react-native";
 import { useRouter } from "expo-router";
 import icon from "@/assets/images/splash-icon.png";
 import { useAuth } from "@/hooks/useAuth";
-import { Button, Text, TextField, Colors, Spacings } from "react-native-ui-lib";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
+import { Button, ButtonText, ButtonIcon } from "@/components/ui/button";
+import { Text } from "@/components/ui/text";
+import {
+  FormControl,
+  FormControlLabel,
+  FormControlLabelText,
+} from "@/components/ui/form-control";
 
 const Login = () => {
   const [email, setEmail] = useState<string>("fabien@feub.net");
@@ -41,55 +50,81 @@ const Login = () => {
     router.replace("/");
   };
 
+  const LoginIcon = () => <MaterialIcons name="login" size={20} />;
+
   return (
     <View style={styles.container}>
       <Image source={icon} style={{ width: 100, height: 100, marginTop: 14 }} />
-      <Text h3 color={Colors.orange}>
-        Sign in
-      </Text>
-      {error ? (
-        <Text style={{ color: "red", marginBottom: 8 }}>{error}</Text>
-      ) : null}
+      <Text size="3xl">Sign in</Text>
+      {error ? <Text className="text-error-400 mt-4">{error}</Text> : null}
 
       <View style={styles.inputContainer}>
-        <TextField
-          ref={emailInputRef}
-          placeholder="Email"
-          floatingPlaceholder
-          value={email}
-          onChangeText={setEmail}
-          autoCapitalize="none"
-          style={styles.input}
-          color={Colors.text}
-          fieldStyle={styles.fieldStyle}
-        />
+        <FormControl
+          // isInvalid={isInvalid}
+          size="md"
+          isDisabled={false}
+          isReadOnly={false}
+          isRequired={false}
+        >
+          <FormControlLabel>
+            <FormControlLabelText>Email</FormControlLabelText>
+          </FormControlLabel>
+          <Input
+            variant="outline"
+            size="md"
+            isDisabled={false}
+            isInvalid={false}
+            isReadOnly={false}
+            className="mb-4"
+          >
+            <InputField
+              placeholder="Email"
+              ref={emailInputRef}
+              value={email}
+              onChangeText={setEmail}
+              autoCapitalize="none"
+            />
+          </Input>
 
-        <TextField
-          placeholder="Password"
-          floatingPlaceholder
-          value={password}
-          onChangeText={setPassword}
-          autoCapitalize="none"
-          secureTextEntry={showPassword}
-          style={styles.input}
-          color={Colors.text}
-          fieldStyle={styles.fieldStyle}
-        />
+          <FormControlLabel>
+            <FormControlLabelText>Password</FormControlLabelText>
+          </FormControlLabel>
+          <Input
+            variant="outline"
+            size="md"
+            isDisabled={false}
+            isInvalid={false}
+            isReadOnly={false}
+            className="mb-4"
+          >
+            <InputField
+              placeholder="Password"
+              value={password}
+              onChangeText={setPassword}
+              autoCapitalize="none"
+              secureTextEntry={showPassword}
+            />
+            <InputSlot>
+              <InputIcon>
+                <MaterialCommunityIcons name="eye" size={24} color="white" />
+              </InputIcon>
+            </InputSlot>
+          </Input>
+        </FormControl>
       </View>
 
-      <Button
-        label={"Login"}
-        backgroundColor={Colors.primary}
-        onPress={handleLogin}
-        marginB-s2
-      />
+      <Button onPress={handleLogin} className="bg-tertiary-400 mb-4">
+        <ButtonIcon as={LoginIcon} />
+        <ButtonText variant="solid" action="primary">
+          Login
+        </ButtonText>
+      </Button>
 
-      <Button
-        label={"Go to index"}
-        outline
-        outlineColor={Colors.primary}
-        onPress={goToIndex}
-      />
+      <Button size="sm" action="secondary" onPress={goToIndex}>
+        <ButtonText variant="outline" action="secondary">
+          Go to index
+        </ButtonText>
+      </Button>
     </View>
   );
 };
@@ -99,24 +134,14 @@ export default Login;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
     alignItems: "center",
-    padding: Spacings.s4,
+    padding: 16,
+    backgroundColor: "#111113",
+    color: "#f1f1f1",
   },
   inputContainer: {
     width: "100%",
     maxWidth: 400,
-    marginVertical: Spacings.s4,
-  },
-  input: {
-    marginVertical: Spacings.s4,
-    width: "100%",
-  },
-  fieldStyle: {
-    backgroundColor: Colors.background,
-    borderColor: Colors.text,
-    borderWidth: 1,
-    paddingHorizontal: Spacings.s2,
-    borderRadius: 10,
+    marginVertical: 16,
   },
 });
