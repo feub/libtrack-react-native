@@ -9,24 +9,23 @@ import {
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { api } from "@/utils/apiRequest";
 import { handleApiError } from "@/utils/handleApiError";
-import { Colors, Text } from "react-native-ui-lib";
 import ServerUnavailable from "@/components/ServerUnavailable";
 import { ListReleaseType } from "@/types/releaseTypes";
 import ReleaseListItem from "@/components/ReleaseListItem";
 import SearchTerm from "@/components/SearchTerm";
 import { useNavigation } from "expo-router";
 import ShelvesFilter from "@/components/ShelvesFilter";
+import { Text } from "@/components/ui/text";
 
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
 export default function Releases() {
   const [releases, setReleases] = useState<ListReleaseType[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [maxPage, setMaxPage] = useState<number>(1);
+  const [, setMaxPage] = useState<number>(1);
   const [totalReleases, setTotalReleases] = useState<number>(0);
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const [searchShelf, setSearchShelf] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [hasMoreData, setHasMoreData] = useState<boolean>(true);
   const [apiAvailable, setApiAvailable] = useState<boolean>(true);
@@ -54,14 +53,14 @@ export default function Releases() {
       const endpoint = `${apiUrl}/api/release?${params.toString()}`;
       const response = await api.get(endpoint);
 
-      if (!response.ok) {
-        const errorData = await response.json();
+      if (!response?.ok) {
+        const errorData = await response?.json();
         handleApiError(
           {
             message: errorData.message || "Failed to list releases",
             response: {
               data: errorData,
-              status: response.status,
+              status: response?.status,
             },
           },
           "Release list",
@@ -166,7 +165,7 @@ export default function Releases() {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={onRefresh}
-              colors={[Colors.primary, "#010101"]}
+              colors={["#fb9d4b", "#010101"]}
             />
           }
           onScroll={({ nativeEvent }) => {
@@ -183,7 +182,7 @@ export default function Releases() {
         >
           {releases.length === 0 && !loading ? (
             <View style={styles.emptyStateContainer}>
-              <Text color={Colors.text}>
+              <Text>
                 {apiAvailable
                   ? `No releases found${
                       searchTerm ? " matching your search" : ""
@@ -199,23 +198,19 @@ export default function Releases() {
 
           {loading && (
             <View style={styles.loadingMoreContainer}>
-              <ActivityIndicator size="small" color={Colors.primary} />
-              <Text color={Colors.text} style={styles.loadingMoreText}>
-                Loading more...
-              </Text>
+              <ActivityIndicator size="small" color="#fb9d4b" />
+              <Text size="xs">Loading more...</Text>
             </View>
           )}
 
           {!loading && !hasMoreData && releases.length > 0 && (
-            <Text color={Colors.text} style={styles.endOfResultsText}>
-              The end 🦕
-            </Text>
+            <Text className="text-center">The end 🦕</Text>
           )}
         </ScrollView>
       </View>
       {loading && (
         <View style={styles.loaderContainer}>
-          <ActivityIndicator size="large" color={Colors.primary} />
+          <ActivityIndicator size="large" color="#fb9d4b" />
         </View>
       )}
     </GestureHandlerRootView>
