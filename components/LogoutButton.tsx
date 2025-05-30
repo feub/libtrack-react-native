@@ -1,9 +1,8 @@
 import React from "react";
-import { StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useAuth } from "@/hooks/useAuth";
-import { Button, Colors, Text } from "react-native-ui-lib";
+import { Button, ButtonText, ButtonIcon } from "@/components/ui/button";
 
 const LogoutButton = () => {
   const { logoutUser } = useAuth();
@@ -14,29 +13,16 @@ const LogoutButton = () => {
     router.replace("/login");
   };
 
+  const LogoutIcon = () => <MaterialIcons name="logout" size={20} />;
+
   return (
-    <Button
-      style={[styles.buttonContainer, { backgroundColor: Colors.primary }]}
-      onPress={handleLogout}
-    >
-      <MaterialIcons name="logout" size={24} color={Colors.background} />
-      <Text style={styles.logoutBtn}>Logout</Text>
+    <Button onPress={handleLogout} className="bg-tertiary-400">
+      <ButtonIcon as={LogoutIcon} />
+      <ButtonText variant="solid" action="primary">
+        Logout
+      </ButtonText>
     </Button>
   );
 };
 
 export default LogoutButton;
-
-const styles = StyleSheet.create({
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 12,
-    padding: 10,
-  },
-  logoutBtn: {
-    fontWeight: "bold",
-    marginLeft: 6,
-  },
-});
