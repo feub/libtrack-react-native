@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, SafeAreaView, View } from "react-native";
-import { Text, Colors, TouchableOpacity } from "react-native-ui-lib";
+import { StyleSheet, SafeAreaView, View, Pressable } from "react-native";
 import { api } from "@/utils/apiRequest";
 import { handleApiError } from "@/utils/handleApiError";
 import { ShelfType } from "@/types/releaseTypes";
+import { Text } from "@/components/ui/text";
 
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
@@ -29,14 +29,14 @@ export default function ShelvesFilter({
       const endpoint = `${apiUrl}/api/shelf`;
       const response = await api.get(endpoint);
 
-      if (!response.ok) {
-        const errorData = await response.json();
+      if (!response?.ok) {
+        const errorData = await response?.json();
         handleApiError(
           {
             message: errorData.message || "Failed fethcing shelves",
             response: {
               data: errorData,
-              status: response.status,
+              status: response?.status,
             },
           },
           "Shelves list",
@@ -76,36 +76,35 @@ export default function ShelvesFilter({
   };
 
   return (
-    <SafeAreaView
-      style={[styles.safeArea, { backgroundColor: Colors.background }]}
-    >
+    <SafeAreaView style={[styles.safeArea]}>
       <View style={styles.container}>
         {!loading &&
           shelves &&
           shelves.map((shelf) => (
-            <TouchableOpacity
+            <Pressable
               key={shelf.id}
               onPress={() => handleShelfPress(shelf.id.toString())}
             >
               <Text
                 style={[
                   styles.btn,
-                  { borderColor: Colors.primary },
+                  { borderColor: "orange" },
                   isShelfSelected(shelf.id.toString()) && {
-                    backgroundColor: Colors.primary,
-                    borderColor: Colors.primary,
+                    backgroundColor: "orange",
+                    borderColor: "orange",
+                    color: "black",
                     borderWidth: 1,
                   },
                 ]}
-                color={
+                className={
                   isShelfSelected(shelf.id.toString())
-                    ? Colors.white
-                    : Colors.text
+                    ? "text-white"
+                    : "text-tertiary-500"
                 }
               >
                 {shelf.location}
               </Text>
-            </TouchableOpacity>
+            </Pressable>
           ))}
       </View>
     </SafeAreaView>
@@ -120,7 +119,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "flex-start",
+    justifyContent: "space-between",
     width: "100%",
     flexWrap: "wrap",
   },
@@ -129,7 +128,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 4,
     paddingHorizontal: 6,
-    paddingVertical: 4,
+    paddingVertical: 0,
     margin: 5,
   },
 });

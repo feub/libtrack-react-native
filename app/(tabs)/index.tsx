@@ -8,7 +8,6 @@ import {
 } from "react-native";
 import { api } from "@/utils/apiRequest";
 import { handleApiError } from "@/utils/handleApiError";
-import { Colors, Text } from "react-native-ui-lib";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { ScanResponseType } from "@/types/releaseTypes";
 import ServerUnavailable from "@/components/ServerUnavailable";
@@ -17,6 +16,7 @@ import MyText from "@/components/MyText";
 import CircleButton from "@/components/CircleButton";
 import ScannedReleaseListItem from "@/components/ScannedReleaseListItem";
 import MyToast from "@/components/MyToast";
+import { Text } from "@/components/ui/text";
 
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
@@ -42,7 +42,7 @@ export default function Index() {
       try {
         const response = await api.get(`${apiUrl}/api/health`);
 
-        if (!response.ok) {
+        if (!response || !response.ok) {
           setApiAvailable(false);
           Alert.alert(
             "API Error",
@@ -79,8 +79,8 @@ export default function Index() {
       });
 
       // Handle non-200 responses that aren't 409 (conflict)
-      if (!response.ok && response.status !== 409) {
-        throw new Error(`Server returned ${response.status}`);
+      if (!response || (!response.ok && response.status !== 409)) {
+        throw new Error(`Server returned ${response?.status}`);
       }
 
       const responseData = await response.json();
@@ -121,7 +121,9 @@ export default function Index() {
           <View style={styles.resultsContainer}>
             <MyText style={styles.dataTextTitle}>
               Barcode:{" "}
-              <Text color={Colors.primary}>{scannedData.data.barcode}</Text>
+              <Text className="text-tertiary-500">
+                {scannedData.data.barcode}
+              </Text>
             </MyText>
             <ScrollView style={{ maxHeight: 550 }}>
               {scannedData.data.releases &&
@@ -139,7 +141,7 @@ export default function Index() {
 
           {loading && (
             <View style={styles.loaderContainer}>
-              <ActivityIndicator size="large" color={Colors.primary} />
+              <ActivityIndicator size="large" className="text-tertiary-500" />
             </View>
           )}
         </>
@@ -161,7 +163,7 @@ export default function Index() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#18181b",
+    backgroundColor: "#111113",
     color: "#f1f1f1",
   },
   topTextContainer: {
