@@ -2,7 +2,8 @@ import React from "react";
 import { useForm, Controller } from "react-hook-form";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { SafeAreaView, View, StyleSheet, Text, Pressable } from "react-native";
-import { TextField, Button, Colors, Spacings } from "react-native-ui-lib";
+import { Input, InputField } from "@/components/ui/input";
+import { Button, ButtonIcon } from "@/components/ui/button";
 
 type SearchTermType = {
   searchTerm: string;
@@ -41,11 +42,15 @@ export default function SearchTerm({ onSubmit }: SearchFormProps) {
     }
   };
 
+  const SearchIcon = () => (
+    <MaterialIcons name="search" size={20} color="#25292e" />
+  );
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         {errors.searchTerm && (
-          <Text style={[styles.errorText, { color: Colors.red30 }]}>
+          <Text className="text-error-500" style={[styles.errorText]}>
             {errors.searchTerm.message as String}
           </Text>
         )}
@@ -56,17 +61,22 @@ export default function SearchTerm({ onSubmit }: SearchFormProps) {
               control={control}
               name="searchTerm"
               defaultValue=""
-              render={({ field: { onChange, onBlur, value } }) => (
-                <TextField
-                  placeholder="Search..."
-                  placeholderTextColor={Colors.grey30}
-                  style={styles.input}
-                  color={Colors.text}
-                  fieldStyle={styles.fieldStyle}
-                  onBlur={onBlur}
-                  onChangeText={onChange}
-                  value={value}
-                />
+              render={({ field: { onChange, value } }) => (
+                <Input
+                  variant="outline"
+                  size="md"
+                  isDisabled={false}
+                  isInvalid={false}
+                  isReadOnly={false}
+                  className="mb-4"
+                >
+                  <InputField
+                    placeholder="Search..."
+                    value={value}
+                    onChangeText={onChange}
+                    autoCapitalize="none"
+                  />
+                </Input>
               )}
             />
 
@@ -75,17 +85,16 @@ export default function SearchTerm({ onSubmit }: SearchFormProps) {
                 style={styles.buttonCancel}
                 onPress={handleResetSearch}
               >
-                <MaterialIcons name="cancel" size={16} color={Colors.text} />
+                <MaterialIcons name="cancel" size={16} color="white" />
               </Pressable>
             )}
           </View>
 
           <Button
-            style={styles.button}
-            backgroundColor={Colors.primary}
             onPress={handleSubmit(onSubmitForm)}
+            className="bg-tertiary-400 mb-4"
           >
-            <MaterialIcons name="search" size={20} color="#25292e" />
+            <ButtonIcon as={SearchIcon} />
           </Button>
         </View>
       </View>
@@ -111,24 +120,6 @@ const styles = StyleSheet.create({
     flex: 1,
     position: "relative",
     marginRight: 10,
-  },
-  input: {
-    width: "100%",
-    height: 40,
-    color: "#ffffff",
-  },
-  fieldStyle: {
-    borderColor: "#6E7881",
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 8,
-    paddingRight: 30,
-    height: 40,
-  },
-  button: {
-    height: 40,
-    width: 40,
-    borderRadius: 8,
   },
   buttonCancel: {
     position: "absolute",
