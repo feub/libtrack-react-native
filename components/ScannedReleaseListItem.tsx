@@ -7,11 +7,21 @@ import {
   ScrollView,
   Alert,
 } from "react-native";
-import { Colors, Text, Modal, Button } from "react-native-ui-lib";
 import { api } from "@/utils/apiRequest";
 import { ScanReleaseType, ShelfType } from "@/types/releaseTypes";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MyText from "@/components/MyText";
+import { Text } from "@/components/ui/text";
+import { Heading } from "@/components/ui/heading";
+import {
+  Modal,
+  ModalBackdrop,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+} from "@/components/ui/modal";
+import { Button, ButtonText } from "./ui/button";
 
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
@@ -43,8 +53,8 @@ function ScannedReleaseListItem({
     try {
       const response = await api.get(`${apiUrl}/api/shelf`);
 
-      if (!response.ok) {
-        const errorData = await response.json();
+      if (!response?.ok) {
+        const errorData = await response?.json();
         console.error(
           "Error getting shelves:",
           errorData.message || "Unknown error",
@@ -107,7 +117,7 @@ function ScannedReleaseListItem({
         {release.artists && release.artists.length > 0 && (
           <>
             <MyText style={styles.dataText}>
-              <Text color={Colors.textDown}>Artist(s):</Text>{" "}
+              <Text className="text-secondary-700">Artist(s):</Text>{" "}
               {release.artists
                 .map((artist: { id: number; name: string }) => artist.name)
                 .join(", ")}
@@ -115,17 +125,17 @@ function ScannedReleaseListItem({
           </>
         )}
         <MyText style={styles.dataText}>
-          <Text color={Colors.textDown}>Title:</Text>{" "}
+          <Text className="text-secondary-700">Title:</Text>{" "}
           {release.title ? release.title : "Title not available"}
         </MyText>
         <MyText style={styles.dataText}>
-          <Text color={Colors.textDown}>Date:</Text>{" "}
+          <Text className="text-secondary-700">Date:</Text>{" "}
           {release.year ? release.year : "Date not available"}
         </MyText>
         {release.formats && release.formats.length > 0 && (
           <>
             <MyText style={styles.dataText}>
-              <Text color={Colors.textDown}>Format:</Text>
+              <Text className="text-secondary-700">Format:</Text>
               {release.formats
                 .map((format: { name: string }) => format.name)
                 .join(", ")}
@@ -136,7 +146,7 @@ function ScannedReleaseListItem({
           <Ionicons
             name="add-circle-outline"
             size={38}
-            color={Colors.primary}
+            color="#fb9d4b"
             style={styles.plusIcon}
           />
         </Pressable>
@@ -157,25 +167,21 @@ function ScannedReleaseListItem({
         </View>
       )}
 
-      <Modal
-        visible={showModal}
-        onRequestClose={closeModal}
-        overlayBackgroundColor={Colors.rgba(20, 20, 20, 0.7)}
-        animationType="slide"
-        transparent
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
+      <Modal isOpen={showModal} onClose={closeModal} size="md">
+        <ModalBackdrop />
+        <ModalContent>
+          <ModalHeader>
+            <Heading size="md" className="text-typography-950">
+              Confirm Release Details
+            </Heading>
+          </ModalHeader>
+          <ModalBody>
             <ScrollView
               style={styles.modalScroll}
               showsVerticalScrollIndicator={false}
             >
-              <Text style={[styles.modalTitle, { color: Colors.white }]}>
-                Confirm Release Details
-              </Text>
-
               <View style={styles.formField}>
-                <Text style={[styles.label, { color: Colors.grey40 }]}>
+                <Text style={[styles.label, { color: "grey" }]}>
                   Select shelf
                 </Text>
                 <View style={styles.shelfContainer}>
@@ -186,16 +192,16 @@ function ScannedReleaseListItem({
                         style={[
                           styles.shelfItem,
                           selectedShelf === shelf.id && {
-                            borderColor: Colors.primary,
+                            borderColor: "#e78128",
                           },
                         ]}
                         onPress={() => handleShelfSelect(shelf.id)}
                       >
                         <Text
                           style={[
-                            { color: Colors.white },
+                            { color: "white" },
                             selectedShelf === shelf.id && {
-                              borderColor: Colors.primary,
+                              borderColor: "#e78128",
                             },
                           ]}
                         >
@@ -205,25 +211,28 @@ function ScannedReleaseListItem({
                     ))}
                 </View>
               </View>
-
-              <View style={styles.buttonContainer}>
-                <Button
-                  label="Cancel"
-                  outline
-                  outlineColor={Colors.grey40}
-                  style={styles.button}
-                  onPress={closeModal}
-                />
-                <Button
-                  label="Add Release"
-                  backgroundColor={Colors.primary}
-                  style={styles.button}
-                  onPress={submitRelease}
-                />
-              </View>
             </ScrollView>
-          </View>
-        </View>
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              variant="outline"
+              action="secondary"
+              onPress={() => {
+                setShowModal(false);
+              }}
+            >
+              <ButtonText>Cancel</ButtonText>
+            </Button>
+            <Button
+              variant="solid"
+              action="primary"
+              onPress={submitRelease}
+              className="bg-tertiary-400"
+            >
+              <ButtonText>Add</ButtonText>
+            </Button>
+          </ModalFooter>
+        </ModalContent>
       </Modal>
     </View>
   );
@@ -264,39 +273,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   mockImageText: {
-    color: Colors.textDowner,
+    color: "#e6e6e7",
   },
   plusIcon: {
     marginTop: 20,
   },
-  modalOverlay: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    padding: 20,
-  },
-  modalContainer: {
-    backgroundColor: "#1E2830",
-    borderRadius: 10,
-    padding: 20,
-    width: "100%",
-    maxWidth: 500,
-    maxHeight: "80%",
-    elevation: 5,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-  },
   modalScroll: {
     maxHeight: "100%",
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 20,
-    textAlign: "center",
   },
   formField: {
     marginBottom: 16,
@@ -317,13 +300,5 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     borderWidth: 1,
     borderColor: "transparent",
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 20,
-  },
-  button: {
-    marginHorizontal: 5,
   },
 });
