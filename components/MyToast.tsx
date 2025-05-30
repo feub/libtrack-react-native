@@ -1,29 +1,24 @@
 import React, { useState } from "react";
-import { Colors, Toast } from "react-native-ui-lib";
+import { useToast, Toast, ToastDescription } from "@/components/ui/toast";
 
 type MyToastProps = {
   message: string;
-  type: "success" | "danger";
+  type: "success" | "error" | "warning" | "info" | "muted" | undefined;
 };
 
 function MyToast({ message, type = "success" }: MyToastProps) {
-  const [toastVisible, setToastVisible] = useState<boolean>(true);
-
-  const bgColor = type === "success" ? "#009872" : "#E93222";
-
-  const dismissToast = () => {
-    setToastVisible(false);
-  };
+  // const toast = useToast();
+  // const [toastId, setToastId] = useState<number>(0);
+  // const handleToast = () => {
+  //   if (!toast.isActive(toastId)) {
+  //     showNewToast();
+  //   }
+  // };
 
   return (
-    <Toast
-      visible={toastVisible}
-      position={"bottom"}
-      autoDismiss={5000}
-      onDismiss={dismissToast}
-      backgroundColor={bgColor}
-      message={message}
-    />
+    <Toast variant="solid" action={type}>
+      <ToastDescription>{message}</ToastDescription>
+    </Toast>
   );
 }
 

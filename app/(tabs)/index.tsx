@@ -113,7 +113,7 @@ export default function Index() {
       )}
 
       {afteradded && <MyToast message={afteradded} type="success" />}
-      {afteraddedError && <MyToast message={afteraddedError} type="danger" />}
+      {afteraddedError && <MyToast message={afteraddedError} type="error" />}
 
       {scannedData ? (
         <>
