@@ -2,10 +2,10 @@ import React, { useState, useEffect, useRef } from "react";
 import { View, StyleSheet, ActivityIndicator } from "react-native";
 import { useIsFocused } from "@react-navigation/native";
 import { Camera, CameraView } from "expo-camera";
-import { Colors, Text } from "react-native-ui-lib";
 import { api } from "@/utils/apiRequest";
 import { handleApiError } from "@/utils/handleApiError";
-import CircleButton from "./CircleButton";
+import CircleButton from "@/components/CircleButton";
+import { Text } from "@/components/ui/text";
 
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
@@ -43,20 +43,16 @@ export default function BarcodeScanner({
     setLoading(true);
 
     try {
-      console.log("handleBarCodeScanned ~ about to scan");
-
       const endpoint = `${apiUrl}/api/release/scan`;
       const response = await api.post(endpoint, {
         barcode: data,
       });
 
-      if (!response.ok) {
-        throw new Error(`Server returned ${response.status}`);
+      if (!response || !response.ok) {
+        throw new Error(`Server returned ${response?.status || "unknown"}`);
       }
 
       const responseData = await response.json();
-
-      console.log("handleBarCodeScanned ~ response:", responseData);
 
       if (
         responseData.type === "success" &&
@@ -102,14 +98,14 @@ export default function BarcodeScanner({
           />
         )}
         <View style={styles.overlay}>
-          <Text style={[styles.scanText, { color: Colors.text }]}>
+          <Text style={[styles.scanText]}>
             Position barcode within frame to scan
           </Text>
         </View>
 
         {loading && (
           <View style={styles.loaderContainer}>
-            <ActivityIndicator size="large" color={Colors.primary} />
+            <ActivityIndicator size="large" color="orange" />
           </View>
         )}
 
