@@ -2,8 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 import { View, Alert, StyleSheet } from "react-native";
 import { Image } from "react-native";
 import { useRouter } from "expo-router";
-import * as SecureStore from "expo-secure-store";
-import { isTokenExpired } from "@/utils/decodeJwt";
 import icon from "@/assets/images/splash-icon.png";
 import { useAuth } from "@/hooks/useAuth";
 import { Button, Text, TextField, Colors, Spacings } from "react-native-ui-lib";
@@ -16,19 +14,7 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState<boolean>(true);
   const emailInputRef = useRef<any>(null);
   const router = useRouter();
-  const { loginUser, user, token } = useAuth();
-
-  // Redirect to tabs if already authenticated and token valid
-  useEffect(() => {
-    const checkAuth = async () => {
-      const accessToken =
-        token || (await SecureStore.getItemAsync("access_token"));
-      if (user && accessToken && !isTokenExpired(accessToken)) {
-        router.replace("/(tabs)");
-      }
-    };
-    checkAuth();
-  }, [user, router, token]);
+  const { loginUser, error } = useAuth();
 
   useEffect(() => {
     if (emailInputRef.current) {
@@ -39,7 +25,7 @@ const Login = () => {
   const handleLogin = async () => {
     try {
       await loginUser(email, password);
-      router.replace("/(tabs)");
+      router.replace("/");
     } catch (error) {
       Alert.alert("Login Failed", "Please try again.", [{ text: "OK" }]);
       console.log(
@@ -52,7 +38,7 @@ const Login = () => {
   };
 
   const goToIndex = () => {
-    router.replace("/(tabs)");
+    router.replace("/");
   };
 
   return (
@@ -61,6 +47,9 @@ const Login = () => {
       <Text h3 color={Colors.orange}>
         Sign in
       </Text>
+      {error ? (
+        <Text style={{ color: "red", marginBottom: 8 }}>{error}</Text>
+      ) : null}
 
       <View style={styles.inputContainer}>
         <TextField

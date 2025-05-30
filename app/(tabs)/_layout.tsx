@@ -1,9 +1,26 @@
-import { Tabs } from "expo-router";
+import { Redirect, Tabs } from "expo-router";
 import { Colors } from "react-native-ui-lib";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function TabLayout() {
+  const { loading, isLoggedIn, token, user } = useAuth();
+
+  console.log("loading", loading);
+  console.log("isLoggedIn", isLoggedIn);
+  console.log("token", token);
+  console.log("user", user);
+
+  if (loading) {
+    return null; // or a loading spinner
+  }
+
+  if (!isLoggedIn) {
+    return <Redirect href="/login" />;
+  }
+
+  // const { user } = useAuth();
   return (
     <Tabs
       screenOptions={{
