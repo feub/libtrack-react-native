@@ -10,7 +10,6 @@ import {
 import { api } from "@/utils/apiRequest";
 import { ScanReleaseType, ShelfType } from "@/types/releaseTypes";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import MyText from "@/components/MyText";
 import { Text } from "@/components/ui/text";
 import { Heading } from "@/components/ui/heading";
 import {
@@ -116,30 +115,30 @@ function ScannedReleaseListItem({
       <View style={styles.textContainer}>
         {release.artists && release.artists.length > 0 && (
           <>
-            <MyText style={styles.dataText}>
+            <Text style={styles.dataText}>
               <Text className="text-secondary-700">Artist(s):</Text>{" "}
               {release.artists
                 .map((artist: { id: number; name: string }) => artist.name)
                 .join(", ")}
-            </MyText>
+            </Text>
           </>
         )}
-        <MyText style={styles.dataText}>
+        <Text style={styles.dataText}>
           <Text className="text-secondary-700">Title:</Text>{" "}
           {release.title ? release.title : "Title not available"}
-        </MyText>
-        <MyText style={styles.dataText}>
+        </Text>
+        <Text style={styles.dataText}>
           <Text className="text-secondary-700">Date:</Text>{" "}
           {release.year ? release.year : "Date not available"}
-        </MyText>
+        </Text>
         {release.formats && release.formats.length > 0 && (
           <>
-            <MyText style={styles.dataText}>
+            <Text style={styles.dataText}>
               <Text className="text-secondary-700">Format:</Text>
               {release.formats
                 .map((format: { name: string }) => format.name)
                 .join(", ")}
-            </MyText>
+            </Text>
           </>
         )}
         <Pressable onPress={openModal}>
@@ -163,7 +162,7 @@ function ScannedReleaseListItem({
         />
       ) : (
         <View style={styles.mockImageContainer}>
-          <MyText style={styles.mockImageText}>Not available</MyText>
+          <Text style={styles.mockImageText}>Not available</Text>
         </View>
       )}
 

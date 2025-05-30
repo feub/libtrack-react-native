@@ -1,8 +1,7 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
-import { Colors } from "react-native-ui-lib";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import MyText from "./MyText";
+import { Text } from "@/components/ui/text";
 
 export default function ServerUnavailable({ message }: { message: string }) {
   message !== ""
@@ -11,22 +10,22 @@ export default function ServerUnavailable({ message }: { message: string }) {
 
   return (
     <View style={styles.apiWarning}>
-      <MaterialIcons name="cloud-off" size={16} color={Colors.yellow30} />
-      <MyText style={styles.apiWarningText}>{message}</MyText>
+      <MaterialIcons name="cloud-off" size={16} color="yellow" />
+      <Text style={styles.apiWarningText}>{message}</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   apiWarning: {
-    backgroundColor: Colors.yellow10,
+    backgroundColor: "yellow",
     padding: 8,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
   },
   apiWarningText: {
-    color: Colors.yellow30,
+    color: "yellow",
     fontSize: 12,
     marginLeft: 5,
   },

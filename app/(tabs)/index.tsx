@@ -12,7 +12,6 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { ScanResponseType } from "@/types/releaseTypes";
 import ServerUnavailable from "@/components/ServerUnavailable";
 import BarcodeScanner from "@/components/BarcodeScanner";
-import MyText from "@/components/MyText";
 import CircleButton from "@/components/CircleButton";
 import ScannedReleaseListItem from "@/components/ScannedReleaseListItem";
 import MyToast from "@/components/MyToast";
@@ -119,12 +118,12 @@ export default function Index() {
       {scannedData ? (
         <>
           <View style={styles.resultsContainer}>
-            <MyText style={styles.dataTextTitle}>
+            <Text style={styles.dataTextTitle}>
               Barcode:{" "}
               <Text className="text-tertiary-500">
                 {scannedData.data.barcode}
               </Text>
-            </MyText>
+            </Text>
             <ScrollView style={{ maxHeight: 550 }}>
               {scannedData.data.releases &&
                 scannedData.data.releases.map((release, index) => (
@@ -150,7 +149,7 @@ export default function Index() {
           <View style={styles.topTextContainer}>
             <View style={styles.textIconContainer}>
               <MaterialIcons name="qr-code-scanner" size={24} color="white" />
-              <MyText style={styles.dataTextScanAnItem}>Scan a release</MyText>
+              <Text style={styles.dataTextScanAnItem}>Scan a release</Text>
             </View>
           </View>
           <BarcodeScanner onScanComplete={handleScanComplete} />

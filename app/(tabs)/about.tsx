@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { Text, View, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { Image } from "react-native";
-import icon from "@/assets/images/splash-icon.png";
-import MyText from "@/components/MyText";
-import LogoutButton from "@/components/LogoutButton";
 import { Pressable } from "react-native";
+import icon from "@/assets/images/splash-icon.png";
+import LogoutButton from "@/components/LogoutButton";
+import { Text } from "@/components/ui/text";
 
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
@@ -27,15 +27,13 @@ export default function About() {
       <Pressable onPress={() => setToggleInfo(!toggleInfo)}>
         <Image source={icon} style={{ width: 100, height: 100 }} />
       </Pressable>
-      <Text style={styles.title}>About LibTrack</Text>
-      <MyText style={styles.paragraph}>
+      <Text className="text-2xl font-bold mb-4">About LibTrack</Text>
+      <Text className="mb-4">
         Catalog your physical music collections (CDs, vinyl, etc.) and
         rediscover your treasures.
-      </MyText>
+      </Text>
       <LogoutButton />
-      {toggleInfo && (
-        <MyText style={{ color: "#555555", marginTop: 14 }}>{info}</MyText>
-      )}
+      {toggleInfo && <Text className="mt-4 text-gray-600">{info}</Text>}
     </View>
   );
 }
@@ -46,18 +44,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#111113",
     color: "white",
     alignItems: "center",
-    paddingVertical: 10,
-  },
-  title: {
-    color: "#ffffff",
-    marginVertical: 10,
-    fontSize: 24,
-  },
-  paragraph: {
-    color: "#ffffff",
-    fontSize: 16,
-    paddingHorizontal: 15,
-    marginBottom: 10,
-    textAlign: "left",
+    padding: 20,
   },
 });
