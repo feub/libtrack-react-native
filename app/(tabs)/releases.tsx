@@ -50,7 +50,7 @@ export default function Releases() {
         limit: "10",
       });
 
-      const endpoint = `${apiUrl}/api/release?${params.toString()}`;
+      const endpoint = `${apiUrl}/api/release/?${params.toString()}`;
       const response = await api.get(endpoint);
 
       if (!response?.ok) {
@@ -96,7 +96,7 @@ export default function Releases() {
       }
     } catch (error: any) {
       setApiAvailable(false);
-      handleApiError(error, "Release list", `${apiUrl}/api/release`);
+      handleApiError(error, "Release list", `${apiUrl}/api/release/`);
     } finally {
       setRefreshing(false);
       setLoading(false);

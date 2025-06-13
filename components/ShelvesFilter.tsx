@@ -16,7 +16,7 @@ export default function ShelvesFilter({
 }) {
   const [shelves, setShelves] = useState<ShelfType[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [apiAvailable, setApiAvailable] = useState<boolean>(true);
+  const [, setApiAvailable] = useState<boolean>(true);
 
   useEffect(() => {
     fetchShelves();
@@ -26,7 +26,7 @@ export default function ShelvesFilter({
     setLoading(true);
 
     try {
-      const endpoint = `${apiUrl}/api/shelf`;
+      const endpoint = `${apiUrl}/api/shelf/`;
       const response = await api.get(endpoint);
 
       if (!response?.ok) {
@@ -55,7 +55,7 @@ export default function ShelvesFilter({
       }
     } catch (error: any) {
       setApiAvailable(false);
-      handleApiError(error, "Shelves list", `${apiUrl}/api/shelf`);
+      handleApiError(error, "Shelves list", `${apiUrl}/api/shelf/`);
     } finally {
       setLoading(false);
     }
