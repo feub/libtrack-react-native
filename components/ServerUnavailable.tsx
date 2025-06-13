@@ -18,14 +18,14 @@ export default function ServerUnavailable({ message }: { message: string }) {
 
 const styles = StyleSheet.create({
   apiWarning: {
-    backgroundColor: "yellow",
+    backgroundColor: "red",
     padding: 8,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
   },
   apiWarningText: {
-    color: "yellow",
+    color: "white",
     fontSize: 12,
     marginLeft: 5,
   },
