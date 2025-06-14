@@ -50,7 +50,7 @@ function ScannedReleaseListItem({
 
   const fetchShelves = async () => {
     try {
-      const response = await api.get(`${apiUrl}/api/shelf`);
+      const response = await api.get(`${apiUrl}/api/shelf/`);
 
       if (!response?.ok) {
         const errorData = await response?.json();
