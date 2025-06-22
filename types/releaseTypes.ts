@@ -42,6 +42,11 @@ export type FormatType = {
   name: string;
 };
 
+export type GenreType = {
+  id: number;
+  name: string;
+};
+
 export type ListReleaseType = {
   id: number;
   title?: string;
@@ -51,4 +56,5 @@ export type ListReleaseType = {
   artists?: ArtistType[];
   shelf?: ShelfType;
   format?: FormatType;
+  genres?: GenreType[];
 };
