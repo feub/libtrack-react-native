@@ -138,13 +138,10 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
 
   // Load stored authentication data when component mounts
   useEffect(() => {
-    console.log("context ~ Loading stored authentication data...");
-
     const loadStoredAuth = async () => {
       setLoading(true);
       try {
         const value = await SecureStore.getItemAsync(authStorageKey);
-        console.log("context ~ Loaded stored authentication data:", value);
 
         if (value !== null) {
           const storedState = JSON.parse(value);
