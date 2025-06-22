@@ -7,8 +7,6 @@ const authStorageKey = "auth-key";
 let refreshingPromise: Promise<boolean> | null = null;
 
 export async function refreshTokenUtil(): Promise<boolean> {
-  console.log("Refreshing token...");
-
   // If multiple API requests fail with 401 simultaneously, only the first one will trigger an actual token refresh
   // All subsequent requests will wait for that same refresh operation to complete
   // Once the refresh is done, all queued requests will continue with the new token
@@ -44,8 +42,6 @@ export async function refreshTokenUtil(): Promise<boolean> {
           refreshToken: data.refresh_token,
         }),
       );
-      console.log("Token refreshed successfully", data.token);
-      console.log("Refresh token refreshed successfully", data.refresh_token);
 
       return true;
     } catch (error) {
